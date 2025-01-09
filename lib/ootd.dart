@@ -131,7 +131,6 @@ class _OOTDPageState extends State<OOTDPage> with SingleTickerProviderStateMixin
                     style: TextStyle(color: Colors.black87),
                   ),
                 ),
-
               ],
             ),
           ),
@@ -144,105 +143,102 @@ class _OOTDPageState extends State<OOTDPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.vertical,
-              itemBuilder: (context, index) {
-                return SafeArea(
-                  child: Column(
-                    children: [
-                      // 상단 텍스트
-                      Padding(
-                        padding: const EdgeInsets.only(top: 36.0, left: 20.0, right: 20.0),
-                        child: Column(
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.only(right: 32),
-                              child: Text(
-                                "오늘 뭐 입지?",
-                                style: TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.normal,
-                                  color: Color(0xFF252525),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final double screenHeight = constraints.maxHeight;
+          final double screenWidth = constraints.maxWidth;
+          final double circleBaseSize = min(screenHeight, screenWidth) * 0.2;
+
+          return Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  scrollDirection: Axis.vertical,
+                  itemBuilder: (context, index) {
+                    return SafeArea(
+                      child: Column(
+                        children: [
+                          // 상단 텍스트
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                            child: Column(
+                              children: const [
+                                Text(
+                                  "오늘 뭐 입지?",
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.normal,
+                                    color: Color(0xFF252525),
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: 5),
+                                Text(
+                                  "OOTD 추천",
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF252525),
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 5),
-                            Padding(
-                              padding: EdgeInsets.only(left: 32),
+                          ),
+                          const Spacer(),
+                          // 중앙의 원과 이미지 배치
+                          SizedBox(
+                            height: screenHeight * 0.5,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Transform.translate(
+                                  offset: Offset(-circleBaseSize * 0.8, -circleBaseSize * 0.5),
+                                  child: buildCircle(circleBaseSize * 0.8, _selectedHat),
+                                ),
+                                Transform.translate(
+                                  offset: Offset(circleBaseSize * 0.8, -circleBaseSize * 0.6),
+                                  child: buildCircle(circleBaseSize * 1.2, _selectedTop),
+                                ),
+                                Transform.translate(
+                                  offset: Offset(-circleBaseSize * 0.8, circleBaseSize * 0.8),
+                                  child: buildCircle(circleBaseSize, _selectedBottom),
+                                ),
+                                Transform.translate(
+                                  offset: Offset(circleBaseSize * 0.8, circleBaseSize * 0.8),
+                                  child: buildCircle(circleBaseSize * 0.9, _selectedShoes),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          // 하단 코멘트
+                          Container(
+                            padding: const EdgeInsets.only(bottom: 30.0),
+                            child: const Center(
                               child: Text(
-                                "OOTD 추천",
+                                "춥고 습한 날씨 대비를 위해\n보온성과 방수성에 신경 써서 준비하세요! 😊",
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  fontSize: 36,
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF252525),
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const Spacer(),
-                      // 중앙의 원과 이미지 배치
-                      SizedBox(
-                        height: 500,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Transform.translate(
-                                offset: const Offset(-80, -50),
-                                child: buildCircle(100, _selectedHat),
-                              ),
-                              Transform.translate(
-                                offset: const Offset(90, -80),
-                                child: buildCircle(160, _selectedTop),
-                              ),
-                              Transform.translate(
-                                offset: const Offset(-90, 110),
-                                child: buildCircle(140, _selectedBottom),
-                              ),
-                              Transform.translate(
-                                offset: const Offset(90, 90),
-                                child: buildCircle(120, _selectedShoes),
-                              ),
-                            ],
                           ),
-                        ),
+                        ],
                       ),
-                      const Spacer(),
-                      // 하단 코멘트
-                      Container(
-                        padding: const EdgeInsets.only(bottom: 60.0),
-                        color: Colors.transparent,
-                        child: const Center(
-                          child: Text(
-                            "춥고 습한 날씨 대비를 위해\n보온성과 방수성에 신경 써서 준비하세요! 😊",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              backgroundColor: Colors.transparent,
-                              fontSize: 18,
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              onPageChanged: (index) {
-                _randomizeOutfit();
-              },
-              physics: const BouncingScrollPhysics(),
-            ),
-          ),
-        ],
+                    );
+                  },
+                  onPageChanged: (index) {
+                    _randomizeOutfit();
+                  },
+                  physics: const BouncingScrollPhysics(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
