@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage> {
               child: Icon(
                 Icons.person,
                 size: 40,
-                color: const Color(0xFF252525),
               ),
             ),
             label: '', // 라벨 제거
