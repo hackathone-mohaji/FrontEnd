@@ -65,6 +65,18 @@ flutter:
     - assets/camfit1.png
     - assets/icon.png
     - assets/profile.png
+    - assets/bottom1.png
+    - assets/bottom2.png
+    - assets/bottom3.png
+    - assets/hat1.png
+    - assets/hat2.png
+    - assets/hat3.png
+    - assets/shoes1.png
+    - assets/shoes2.png
+    - assets/shoes3.png
+    - assets/top1.png
+    - assets/top2.png
+    - assets/top3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
