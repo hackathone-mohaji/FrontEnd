@@ -39,6 +39,7 @@ class Login extends StatelessWidget {
                     controller: signUpNameController,
                     decoration: InputDecoration(
                       labelText: '이름',
+                      labelStyle: TextStyle(color: Colors.black54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -52,6 +53,7 @@ class Login extends StatelessWidget {
                     controller: signUpEmailController,
                     decoration: InputDecoration(
                       labelText: '이메일',
+                      labelStyle: TextStyle(color: Colors.black54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -66,6 +68,7 @@ class Login extends StatelessWidget {
                     obscureText: true,
                     decoration: InputDecoration(
                       labelText: '비밀번호',
+                      labelStyle: TextStyle(color: Colors.black54),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -112,104 +115,144 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/novowel_app.png',
-              height: 200,
-            ),
-            const SizedBox(),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFFFF),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 10.0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: '이메일',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                ),
-              ),
-              width: 450,
-            ),
-            const SizedBox(height: 20),
-            Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFFFF),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 10.0,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              child: TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: '비밀번호',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                ),
-              ),
-              width: 450,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () => showSignUpDialog(context),
-                  child: const Text('회원가입'),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('아이디 / 비밀번호 찾기'),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            'assets/camfit1.png',
+            height: 200,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const SizedBox(),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10.0,
+                  offset: const Offset(0, 4),
                 ),
               ],
+              borderRadius: BorderRadius.circular(30.0),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/main');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF252525),
-                padding: const EdgeInsets.symmetric(vertical: 20),
-              ),
-              child: Container(
-                child: const Center(
-                  child: Text(
-                    '로그인',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFFFFFFF),
-                    ),
+            child: TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: ' 이메일',
+                labelStyle: TextStyle(fontSize: 14, color: Colors.black87),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.black26, // 포커스 상태에서의 테두리 색상
+                    width: 1.0,
                   ),
                 ),
-                width: 450,
-                height: 25,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.white70, // 비활성 상태에서의 테두리 색상
+                    width: 1.0,
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
+            width: 450,
+          ),
+          const SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10.0,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            child: TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: ' 비밀번호',
+                labelStyle: TextStyle(fontSize: 14, color: Colors.black87),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.black26, // 포커스 상태에서의 테두리 색상
+                    width: 1.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: Colors.white70, // 비활성 상태에서의 테두리 색상
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+            width: 450,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () => showSignUpDialog(context),
+                child: const Text(
+                  '회원가입',
+                  style: TextStyle(color: Colors.black87)
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                child: const Text(
+                  '아이디 / 비밀번호 찾기',
+                  style: TextStyle(color: Colors.black87)
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/main');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF252525),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              child: const Center(
+                child: Text(
+                  '로그인',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+              width: 450,
+              height: 25,
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+

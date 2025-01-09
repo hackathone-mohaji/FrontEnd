@@ -96,7 +96,7 @@ class _OOTDPageState extends State<OOTDPage> with SingleTickerProviderStateMixin
           children: [
             // 상단 텍스트
             Padding(
-              padding: const EdgeInsets.only(top: 30.0, left: 20.0, right: 20.0),
+              padding: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
               child: Column(
                 children: [
                   Row(
@@ -107,7 +107,7 @@ class _OOTDPageState extends State<OOTDPage> with SingleTickerProviderStateMixin
                         child: Text(
                           "오늘 뭐 입지?",
                           style: TextStyle(
-                            fontSize: 31,
+                            fontSize: 32,
                             fontWeight: FontWeight.normal,
                             color: Color(0xFF252525),
                           ),

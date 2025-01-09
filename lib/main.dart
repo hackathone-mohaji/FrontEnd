@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'n5v5w2l',
+      title: 'camfit',
       initialRoute: '/',
       routes: {
         '/': (context) => Login(),
@@ -60,9 +60,9 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Padding(
-              padding: EdgeInsets.only(top: 8.0), // 아이콘 중앙 정렬
+              padding: EdgeInsets.only(top: 7.5), // 아이콘 중앙 정렬
               child: ImageIcon(
-                AssetImage('assets/novowel.png'),
+                AssetImage('assets/icon.png'),
                 size: 40,
               ),
             ),
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: Padding(
-              padding: EdgeInsets.only(top: 8.0), // 아이콘 중앙 정렬
+              padding: EdgeInsets.only(top: 7.5), // 아이콘 중앙 정렬
               child: Icon(
                 Icons.person,
                 size: 40,
