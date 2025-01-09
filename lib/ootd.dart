@@ -138,7 +138,7 @@ class _OOTDPageState extends State<OOTDPage> with SingleTickerProviderStateMixin
             const Spacer(),
             // 중앙 원
             SizedBox(
-              height: 600, // 원 배치 영역의 높이
+              height: 500, // 원 배치 영역의 높이
               child: Align(
                 alignment: Alignment.center,
                 child: Stack(
