@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -13,9 +15,115 @@ class _ProfilePageState extends State<ProfilePage>
   final List<File> _selectedPhotos = [];
   final ImagePicker _picker = ImagePicker();
   File? _profilePhoto;
+  String? _name;
+  String? _profilePhotoUrl;
   bool _isDeleteMode = false;
   bool _isFabOpen = false;
-  bool _isCategoryExpanded = false; // 옷장 카테고리 토글 상태
+  bool _isCategoryExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileData(); // 프로필 데이터 초기화
+  }
+
+  // 사용자 이름 및 프로필 이미지 가져오기
+  Future<void> _fetchProfileData() async {
+    const String profileUrl = 'http://182.214.198.108:8888/auth/profile';
+
+    try {
+      final response = await http.get(
+        Uri.parse(profileUrl),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _name = data['name'];
+          _profilePhotoUrl = data['profilePhotoUrl'];
+        });
+      } else {
+        throw Exception('프로필 데이터를 가져오는 데 실패했습니다.');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('오류: $e')),
+      );
+    }
+  }
+
+  // 프로필 사진 변경
+  Future<void> _changeProfilePhoto() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+    if (photo != null) {
+      const String uploadUrl = 'http://182.214.198.108:8888/auth/profile/photo';
+
+      try {
+        final request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+        request.files.add(await http.MultipartFile.fromPath(
+          'profilePhoto',
+          photo.path,
+        ));
+        final response = await request.send();
+
+        if (response.statusCode == 200) {
+          final responseData = await response.stream.bytesToString();
+          final data = jsonDecode(responseData);
+
+          setState(() {
+            _profilePhotoUrl = data['profilePhotoUrl'];
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('프로필 사진이 성공적으로 업데이트되었습니다.')),
+          );
+        } else {
+          throw Exception('프로필 사진 업로드에 실패했습니다.');
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('오류: $e')),
+        );
+      }
+    }
+  }
+
+  // 갤러리에서 사진 추가
+  Future<void> _addPhotoFromGallery() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
+    if (photo != null) {
+      setState(() {
+        _photos.add(File(photo.path));
+      });
+    }
+  }
+
+  // 카메라로 사진 추가
+  Future<void> _addPhotoFromCamera() async {
+    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+    if (photo != null) {
+      setState(() {
+        _photos.add(File(photo.path));
+      });
+    }
+  }
+
+  // 선택된 사진 삭제
+  void _deleteSelectedPhotos() {
+    setState(() {
+      _photos.removeWhere((photo) => _selectedPhotos.contains(photo));
+      _selectedPhotos.clear();
+      _isDeleteMode = false;
+    });
+  }
+
+  // FAB 토글
+  void _toggleFab() {
+    setState(() {
+      _isFabOpen = !_isFabOpen;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +132,6 @@ class _ProfilePageState extends State<ProfilePage>
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color(0xFFFFFFFF),
-        iconTheme: const IconThemeData(color: Color(0xFF252525)),
-      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -38,21 +141,21 @@ class _ProfilePageState extends State<ProfilePage>
                 vertical: screenHeight * 0.02,
                 horizontal: screenWidth * 0.05,
               ),
-              child: Column(
+              child: Row(
                 children: [
                   GestureDetector(
                     onTap: _changeProfilePhoto,
                     child: CircleAvatar(
                       radius: screenWidth * 0.06,
-                      backgroundImage: _profilePhoto != null
-                          ? FileImage(_profilePhoto!)
-                          : AssetImage("assets/profile.png") as ImageProvider,
+                      backgroundImage: _profilePhotoUrl != null
+                          ? NetworkImage(_profilePhotoUrl!) as ImageProvider
+                          : AssetImage("assets/profile.png"),
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.02),
-                  const Text(
-                    "qwer1234님, 안녕하세요!",
-                    style: TextStyle(
+                  SizedBox(width: screenWidth * 0.05),
+                  Text(
+                    _name != null ? "$_name님, 안녕하세요!" : "불러오는 중...",
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF252525),
@@ -81,7 +184,7 @@ class _ProfilePageState extends State<ProfilePage>
                 },
                 children: [
                   SizedBox(
-                    height: screenHeight * 0.3, // 화면의 30% 높이
+                    height: screenHeight * 0.3,
                     child: SingleChildScrollView(
                       child: _buildCategorySection(),
                     ),
@@ -154,8 +257,10 @@ class _ProfilePageState extends State<ProfilePage>
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black87,
                   ),
-                  child: const Text("선택한 사진 삭제",
-                      style: TextStyle(color: Colors.white)),
+                  child: const Text(
+                    "선택한 사진 삭제",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
           ],
@@ -279,46 +384,5 @@ class _ProfilePageState extends State<ProfilePage>
         ],
       ),
     );
-  }
-
-  Future<void> _changeProfilePhoto() async {
-    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
-    if (photo != null) {
-      setState(() {
-        _profilePhoto = File(photo.path);
-      });
-    }
-  }
-
-  Future<void> _addPhotoFromGallery() async {
-    final XFile? photo = await _picker.pickImage(source: ImageSource.gallery);
-    if (photo != null) {
-      setState(() {
-        _photos.add(File(photo.path));
-      });
-    }
-  }
-
-  Future<void> _addPhotoFromCamera() async {
-    final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-    if (photo != null) {
-      setState(() {
-        _photos.add(File(photo.path));
-      });
-    }
-  }
-
-  void _deleteSelectedPhotos() {
-    setState(() {
-      _photos.removeWhere((photo) => _selectedPhotos.contains(photo));
-      _selectedPhotos.clear();
-      _isDeleteMode = false;
-    });
-  }
-
-  void _toggleFab() {
-    setState(() {
-      _isFabOpen = !_isFabOpen;
-    });
   }
 }

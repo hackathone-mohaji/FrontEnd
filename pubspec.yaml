@@ -78,6 +78,9 @@ flutter:
     - assets/top1.png
     - assets/top2.png
     - assets/top3.png
+    - assets/accessory1.png
+    - assets/accessory2.png
+    - assets/accessory3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
