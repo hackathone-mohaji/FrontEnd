@@ -87,28 +87,25 @@ class SignupPage extends StatelessWidget {
                       backgroundColor: const Color(0xFF252525),
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Container(
-                        width: double.infinity,
-                        child: const Center(
-                          child: Text(
-                            '회원가입',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white70,
-                            ),
+                    child: SizedBox(
+                      width: 330,
+                      child: const Center(
+                        child: Text(
+                          '회원가입',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                   ),
+                 ],
+               ),
               ),
             ),
-          ),
-      );
-    }
+          );
+        }
       ),
     );
   }
