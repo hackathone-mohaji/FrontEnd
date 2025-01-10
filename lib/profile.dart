@@ -117,13 +117,16 @@ class _ProfilePageState extends State<ProfilePage>
                       },
                       child: Stack(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: FileImage(photo),
-                                fit: BoxFit.cover,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: FileImage(photo),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
