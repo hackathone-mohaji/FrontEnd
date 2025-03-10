@@ -14,7 +14,17 @@ class _OotdPageState extends State<OotdPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late PageController _pageController;
-  late OotdDto _selectedOOTD;
+  OotdDto _selectedOOTD = OotdDto(
+    outer: null,
+    top: null,
+    bottom: null,
+    shoes: null,
+    reason: "추천 이유 없음",
+    combinationId: 0,
+    bookmarked: false,
+    totalCount: 0,
+  );
+
   bool _isLoading = true;
 
   final OotdController _controllerLogic = OotdController();
@@ -25,7 +35,8 @@ class _OotdPageState extends State<OotdPage>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
 
     _pageController = PageController();
     _initializePage();
@@ -91,9 +102,9 @@ class _OotdPageState extends State<OotdPage>
                 ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white70),
+                  ElevatedButton.styleFrom(backgroundColor: Colors.white70),
                   child:
-                      const Text("닫기", style: TextStyle(color: Colors.black87)),
+                  const Text("닫기", style: TextStyle(color: Colors.black87)),
                 ),
               ],
             ),
@@ -111,14 +122,16 @@ class _OotdPageState extends State<OotdPage>
         controller: _pageController,
         scrollDirection: Axis.vertical,
         onPageChanged: _onPageChanged,
-        physics: _isLoading ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
+        physics: _isLoading
+            ? const NeverScrollableScrollPhysics()
+            : const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
           return SafeArea(
             child: Column(
               children: [
                 const Padding(
                   padding:
-                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                  EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                   child: Column(
                     children: [
                       Text(
@@ -144,59 +157,63 @@ class _OotdPageState extends State<OotdPage>
                 const Spacer(),
                 _isLoading
                     ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
+                  child: CircularProgressIndicator(),
+                )
                     : SizedBox(
-                        height: 300,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              if (_selectedOOTD?.outer != null)
-                                Transform.translate(
-                                  offset: const Offset(-50, -60),
-                                  child: CircleImageWidget(
-                                    size: 70,
-                                    imagePath: _selectedOOTD!.outer!,
-                                    onTap: () => _showCircleModal(
-                                        context, _selectedOOTD!.outer!),
-                                  ),
-                                ),
-                              if (_selectedOOTD?.top != null)
-                                Transform.translate(
-                                  offset: const Offset(70, -100),
-                                  child: CircleImageWidget(
-                                    size: 120,
-                                    imagePath: _selectedOOTD!.top!,
-                                    onTap: () => _showCircleModal(
-                                        context, _selectedOOTD!.top!),
-                                  ),
-                                ),
-                              if (_selectedOOTD?.bottom != null)
-                                Transform.translate(
-                                  offset: const Offset(-60, 60),
-                                  child: CircleImageWidget(
-                                    size: 100,
-                                    imagePath: _selectedOOTD!.bottom!,
-                                    onTap: () => _showCircleModal(
-                                        context, _selectedOOTD!.bottom!),
-                                  ),
-                                ),
-                              if (_selectedOOTD?.shoes != null)
-                                Transform.translate(
-                                  offset: const Offset(60, 30),
-                                  child: CircleImageWidget(
-                                    size: 80,
-                                    imagePath: _selectedOOTD!.shoes!,
-                                    onTap: () => _showCircleModal(
-                                        context, _selectedOOTD!.shoes!),
-                                  ),
-                                ),
-                            ],
+                  height: 300,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (_selectedOOTD?.outer != null)
+                          Transform.translate(
+                            offset: const Offset(-50, -60),
+                            child: CircleImageWidget(
+                              size: 70,
+                              imagePath: _selectedOOTD!.outer!,
+                              onTap: () =>
+                                  _showCircleModal(
+                                      context, _selectedOOTD!.outer!),
+                            ),
                           ),
-                        ),
-                      ),
+                        if (_selectedOOTD?.top != null)
+                          Transform.translate(
+                            offset: const Offset(70, -100),
+                            child: CircleImageWidget(
+                              size: 120,
+                              imagePath: _selectedOOTD!.top!,
+                              onTap: () =>
+                                  _showCircleModal(
+                                      context, _selectedOOTD!.top!),
+                            ),
+                          ),
+                        if (_selectedOOTD?.bottom != null)
+                          Transform.translate(
+                            offset: const Offset(-60, 60),
+                            child: CircleImageWidget(
+                              size: 100,
+                              imagePath: _selectedOOTD!.bottom!,
+                              onTap: () =>
+                                  _showCircleModal(
+                                      context, _selectedOOTD!.bottom!),
+                            ),
+                          ),
+                        if (_selectedOOTD?.shoes != null)
+                          Transform.translate(
+                            offset: const Offset(60, 30),
+                            child: CircleImageWidget(
+                              size: 80,
+                              imagePath: _selectedOOTD!.shoes!,
+                              onTap: () =>
+                                  _showCircleModal(
+                                      context, _selectedOOTD!.shoes!),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.only(bottom: 20.0),
