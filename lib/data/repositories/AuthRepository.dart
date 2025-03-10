@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
   final String _baseUrl = 'http://182.214.198.108:8888/auth';
@@ -14,10 +15,19 @@ class AuthRepository {
         body: jsonEncode({"email": email, "password": password}),
       );
 
+      final decodedBody = utf8.decode(response.bodyBytes);
+
+        final data = jsonDecode(decodedBody);
       if (response.statusCode == 200) {
-        return {"success": true, "data": jsonDecode(response.body)};
+
+        //Access Token 저장
+        final String accessToken = data['accessToken'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', accessToken);
+
+        return {"success": true, "data": data};
       } else {
-        return {"success": false, "error": jsonDecode(response.body)['error'] ?? '알 수 없는 오류'};
+        return {"success": false, "error": data['message'] ?? '알 수 없는 오류'};
       }
     } catch (e) {
       return {"success": false, "error": e.toString()};
@@ -39,10 +49,13 @@ class AuthRepository {
         }),
       );
 
+      final decodedBody = utf8.decode(response.bodyBytes);
+
+
       if (response.statusCode == 200) {
         return {"success": true};
       } else {
-        final error = jsonDecode(response.body)['error'] ?? '알 수 없는 오류';
+        final error = jsonDecode(decodedBody)['message'] ?? '알 수 없는 오류';
         return {"success": false, "error": error};
       }
     } catch (e) {
