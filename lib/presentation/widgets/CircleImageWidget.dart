@@ -29,7 +29,7 @@ class CircleImageWidget extends StatelessWidget {
             ),
           ],
           image: DecorationImage(
-            image: AssetImage(imagePath),
+            image: NetworkImage(imagePath),
             fit: BoxFit.cover,
           ),
         ),

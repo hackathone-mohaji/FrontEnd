@@ -1,9 +1,10 @@
 import 'package:camfit/data/repositories/OotdRepository.dart';
+import 'package:camfit/data/models/OotdDto.dart';
 
 class OotdController {
   final OotdRepository _repository = OotdRepository();
 
-  Map<String, String> fetchOOTD() {
-    return _repository.getRandomOOTD();
+  Future<OotdDto> fetchOOTD() async {
+    return await _repository.getRandomOOTD();
   }
 }
