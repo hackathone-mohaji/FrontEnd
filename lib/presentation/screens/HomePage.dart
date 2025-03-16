@@ -31,40 +31,49 @@ class _HomePageState extends State<HomePage> {
           ProfilePage(),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: const Color(0xFFFFFFFF),
-        selectedItemColor: const Color(0xFF252525),
-        unselectedItemColor: const Color(0xFF757575),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.only(top: 7.5),
-              child: Icon(Icons.menu, size: 40),
-            ),
-            label: '',
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 2, // ✅ 구분선 두께
+            color: Colors.grey[300],
           ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 7.5),
-              child: Image.asset(
-                'assets/novowel.png',
-                width: 60,
-                height: 60,
+          BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabTapped,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: const Color(0xFFFFFFFF),
+            selectedItemColor: const Color(0xFF252525),
+            unselectedItemColor: const Color(0xFF757575),
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              const BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(top: 7.5),
+                  child: Icon(Icons.menu, size: 40),
+                ),
+                label: '',
               ),
-            ),
-            label: '',
-          ),
-          const BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.only(top: 7.5),
-              child: Icon(Icons.person, size: 35, color: Colors.black),
-            ),
-            label: '',
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: const EdgeInsets.only(top: 7.5),
+                  child: Image.asset(
+                    'assets/novowel.png',
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+                label: '',
+              ),
+              const BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(top: 7.5),
+                  child: Icon(Icons.person, size: 35, color: Colors.black),
+                ),
+                label: '',
+              ),
+            ],
           ),
         ],
       ),
