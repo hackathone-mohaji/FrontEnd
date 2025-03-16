@@ -9,6 +9,7 @@ class LoginPage extends StatelessWidget {
   final TextEditingController passwordController = TextEditingController();
   final LoginController _loginController = LoginController();
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +24,7 @@ class LoginPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/camfit1.png',
+                      'assets/novowel.png',
                       height: MediaQuery.of(context).padding.top + 180,
                       fit: BoxFit.contain,
                     ),
@@ -40,49 +41,56 @@ class LoginPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () async {
-                            final result = await Navigator.pushNamed(context, '/signup');
+                            final result =
+                                await Navigator.pushNamed(context, '/signup');
                             if (result == 'signup_success') {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('회원가입이 완료되었습니다!')),
                               );
                             }
                           },
-                          child: const Text('회원가입', style: TextStyle(color: Colors.black87)),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child:
-                              const Text('아이디 / 비밀번호 찾기', style: TextStyle(color: Colors.black87)),
+                          child: const Text('회원가입',
+                              style: TextStyle(color: Colors.black87)),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        final email = emailController.text.trim();
-                        final password = passwordController.text.trim();
+                    const SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.center,
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width *
+                            0.9, // 화면 너비의 70% 차지
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final email = emailController.text.trim();
+                            final password = passwordController.text.trim();
 
-                        if (email.isNotEmpty && password.isNotEmpty) {
-                          _loginController.login(email, password, context);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('이메일과 비밀번호를 입력해주세요.')),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF252525),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '로그인',
-                          style:
-                              TextStyle(fontSize: 16, color: Colors.white70),
+                            if (email.isNotEmpty && password.isNotEmpty) {
+                              _loginController.login(email, password, context);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text('이메일과 비밀번호를 입력해주세요.')),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF252525),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16), // 버튼 높이 조절
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10), // radius 줄이기 (기본값 30~50 → 10으로 변경)
+                            ),
+                          ),
+                          child: const Text(
+                            '로그인',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.white70),
+                          ),
                         ),
                       ),
                     ),

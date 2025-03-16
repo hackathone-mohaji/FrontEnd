@@ -26,7 +26,7 @@ class CustomTextField extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(10.0),
         ),
         child: TextField(
           controller: controller,
@@ -37,10 +37,10 @@ class CustomTextField extends StatelessWidget {
                 const TextStyle(fontSize: 14, color: Colors.black87),
             border:
                 OutlineInputBorder(borderRadius:
-                BorderRadius.circular(30.0)),
+                BorderRadius.circular(10.0)),
             focusedBorder:
                 OutlineInputBorder(borderRadius:
-                BorderRadius.circular(30.0), borderSide:
+                BorderRadius.circular(10.0), borderSide:
                 BorderSide(color:
                 Colors.black26)),
           ),

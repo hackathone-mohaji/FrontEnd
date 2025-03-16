@@ -49,6 +49,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -63,22 +64,15 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/camfit.png
-    - assets/camfit1.png
-    - assets/icon.png
-    - assets/profile.png
-    - assets/bottom1.png
-    - assets/bottom2.png
-    - assets/bottom3.png
-    - assets/hat1.png
-    - assets/hat2.png
-    - assets/hat3.png
-    - assets/shoes1.png
-    - assets/shoes2.png
-    - assets/shoes3.png
-    - assets/top1.png
-    - assets/top2.png
-    - assets/top3.png
+    - assets/
+
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/novowel_icon.png" # 사용할 앱 아이콘 경로
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
