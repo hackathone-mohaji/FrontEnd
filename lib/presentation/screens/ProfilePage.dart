@@ -78,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: const Color(0xFFFFFFFF),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Column(
           children: [
             GestureDetector(
@@ -101,8 +101,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 itemCount: _wearList.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, // ✅ 가로 3개씩
-                  crossAxisSpacing: 10, // 가로 간격
-                  mainAxisSpacing: 10, // 세로 간격
+                  crossAxisSpacing: 16, // 가로 간격
+                  mainAxisSpacing: 16, // 세로 간격
                   childAspectRatio: 1, // ✅ 정사각형으로 표시
                 ),
                 itemBuilder: (context, index) {

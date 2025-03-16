@@ -13,6 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 1;
   final PageController _pageController = PageController(initialPage: 1);
+
   void _onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -32,51 +33,36 @@ class _HomePageState extends State<HomePage> {
           ProfilePage(),
         ],
       ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 2,
-            color: Colors.grey[300],
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8), // 👈 수직 패딩만큼 조정 가능
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Color(0xFFE0E0E0), width: 2),
           ),
-          BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: _onTabTapped,
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: const Color(0xFFFFFFFF),
-            selectedItemColor: const Color(0xFF252525),
-            unselectedItemColor: const Color(0xFF757575),
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            items: [
-              const BottomNavigationBarItem(
-                icon: Padding(
-                  padding: EdgeInsets.only(top: 7.5),
-                  child: Icon(Icons.menu, size: 40),
-                ),
-                label: '',
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.menu, size: 30),
+              onPressed: () => _onTabTapped(0),
+            ),
+            IconButton(
+              padding: EdgeInsets.zero,
+              onPressed: () => _onTabTapped(1),
+              icon: Image.asset(
+                'assets/novowel.png',
+                width: 50,
+                height: 50,
               ),
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: const EdgeInsets.only(top: 7.5),
-                  child: Image.asset(
-                    'assets/novowel.png',
-                    width: 60,
-                    height: 60,
-                  ),
-                ),
-                label: '',
-              ),
-              const BottomNavigationBarItem(
-                icon: Padding(
-                  padding: EdgeInsets.only(top: 7.5),
-                  child: Icon(Icons.person, size: 35, color: Colors.black),
-                ),
-                label: '',
-              ),
-            ],
-          ),
-        ],
+            ),
+            IconButton(
+              onPressed: () => _onTabTapped(2),
+              icon: const Icon(Icons.person, size: 35),
+            ),
+          ],
+        ),
       ),
     );
   }
