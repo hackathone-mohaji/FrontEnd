@@ -1,8 +1,8 @@
 import 'package:camfit/data/models/WearDto.dart';
+import 'package:camfit/presentation/widgets/WearGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/ProfileController.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
-import 'package:camfit/data/models/OotdDto.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,6 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _profilePhotoUrl;
   String? _username;
   List<WearDto> _wearList = [];
+  String _selectedCategory = 'TOP';
 
   @override
   void initState() {
@@ -58,7 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadMyWearList() async {
     try {
-      final wearList = await _ootdController.fetchMyWearList(context: context);
+      final wearList = await _ootdController.fetchMyWearList(
+          context: context, category: _selectedCategory);
       setState(() {
         _wearList = wearList;
       });
@@ -72,13 +74,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Profile"),
-        backgroundColor: const Color(0xFFFFFFFF),
+        backgroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      body: SingleChildScrollView(
         child: Column(
           children: [
             GestureDetector(
@@ -96,40 +97,52 @@ class _ProfilePageState extends State<ProfilePage> {
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            Expanded(
-              child: GridView.builder(
-                itemCount: _wearList.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // ✅ 가로 3개씩
-                  crossAxisSpacing: 16, // 가로 간격
-                  mainAxisSpacing: 16, // 세로 간격
-                  childAspectRatio: 1, // ✅ 정사각형으로 표시
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _categoryButton('TOP'),
+                    _categoryButton('BOTTOM'),
+                    _categoryButton('OUTERWEAR'),
+                    _categoryButton('SHOES'),
+                  ],
                 ),
-                itemBuilder: (context, index) {
-                  final wear = _wearList[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200], // ✅ 옅은 회색 배경 추가
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        wear.wearImageUrl, // OotdDto의 imageUrl 필드를 사용한다고 가정
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child:
-                                Icon(Icons.error_outline, color: Colors.grey),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: WearGrid(wearList: _wearList),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _categoryButton(String category) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            _selectedCategory = category;
+            _loadMyWearList();
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              _selectedCategory == category ? Colors.black : Colors.grey[300],
+          foregroundColor:
+              _selectedCategory == category ? Colors.white : Colors.black,
+        ),
+        child: Text(category),
       ),
     );
   }

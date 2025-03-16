@@ -27,8 +27,10 @@ class OotdRepository {
   }
 
   /// 내 옷 목록 불러오기 ///
-  Future<List<WearDto>> getMyWearList({required BuildContext context}) async {
-    final response = await _httpClient.get(_endPoint, context: context);
+  Future<List<WearDto>> getMyWearList(
+      {required BuildContext context, required String category}) async {
+    final response = await _httpClient.get('$_endPoint?category=$category',
+        context: context);
 
     final decodedBody = utf8.decode(response.bodyBytes);
 
@@ -36,7 +38,8 @@ class OotdRepository {
       final List<dynamic> data = jsonDecode(decodedBody);
       return data.map((json) => WearDto.fromJson(json)).toList();
     } else {
-      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 데이터 불러오기 실패';
+      final errorMessage =
+          jsonDecode(decodedBody)['message'] ?? '옷 데이터 불러오기 실패';
       throw Exception(errorMessage);
     }
   }

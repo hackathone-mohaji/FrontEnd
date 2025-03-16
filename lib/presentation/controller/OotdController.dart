@@ -12,8 +12,8 @@ class OotdController {
   }
 
   ///내 옷장 불러오기///
-  Future<List<WearDto>> fetchMyWearList({required BuildContext context}) async {
-    final response = await _repository.getMyWearList(context: context);
+  Future<List<WearDto>> fetchMyWearList({required BuildContext context,required String category}) async {
+    final response = await _repository.getMyWearList(context: context,category: category);
     return response
         .map((data) => WearDto.fromJson(data.toJson()))
         .toList();
