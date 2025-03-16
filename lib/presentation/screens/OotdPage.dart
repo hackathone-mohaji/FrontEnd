@@ -1,3 +1,4 @@
+import 'package:camfit/presentation/widgets/ExpandableTextContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
 import 'package:camfit/presentation/widgets/CircleImageWidget.dart';
@@ -134,17 +135,9 @@ class _OotdPageState extends State<OotdPage>
                   EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                   child: Column(
                     children: [
+                      SizedBox(height: 20),
                       Text(
-                        "오늘 뭐 입지?",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.normal,
-                          color: Color(0xFF252525),
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "OOTD 추천",
+                        "Novowel의 추천",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -163,72 +156,61 @@ class _OotdPageState extends State<OotdPage>
                   height: 300,
                   child: Align(
                     alignment: Alignment.center,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        if (_selectedOOTD?.outer != null)
-                          Transform.translate(
-                            offset: const Offset(-50, -60),
-                            child: CircleImageWidget(
-                              size: 70,
-                              imagePath: _selectedOOTD!.outer!,
-                              onTap: () =>
-                                  _showCircleModal(
-                                      context, _selectedOOTD!.outer!),
-                            ),
-                          ),
-                        if (_selectedOOTD?.top != null)
-                          Transform.translate(
-                            offset: const Offset(70, -100),
-                            child: CircleImageWidget(
-                              size: 120,
-                              imagePath: _selectedOOTD!.top!,
-                              onTap: () =>
-                                  _showCircleModal(
-                                      context, _selectedOOTD!.top!),
-                            ),
-                          ),
-                        if (_selectedOOTD?.bottom != null)
-                          Transform.translate(
-                            offset: const Offset(-60, 60),
-                            child: CircleImageWidget(
-                              size: 100,
-                              imagePath: _selectedOOTD!.bottom!,
-                              onTap: () =>
-                                  _showCircleModal(
-                                      context, _selectedOOTD!.bottom!),
-                            ),
-                          ),
-                        if (_selectedOOTD?.shoes != null)
-                          Transform.translate(
-                            offset: const Offset(60, 30),
-                            child: CircleImageWidget(
-                              size: 80,
-                              imagePath: _selectedOOTD!.shoes!,
-                              onTap: () =>
-                                  _showCircleModal(
-                                      context, _selectedOOTD!.shoes!),
-                            ),
-                          ),
-                      ],
+                    child: Builder(
+                      builder: (context) {
+                        List<double> availableSizes = [70, 120, 100, 80]; // 중복 방지용 사이즈 리스트
+                        availableSizes.shuffle(); // ✅ 리스트를 랜덤하게 섞어서 중복되지 않게 함
+
+                        return Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            if (_selectedOOTD?.outer != null)
+                              Transform.translate(
+                                offset: const Offset(-50, -60),
+                                child: CircleImageWidget(
+                                  size: availableSizes.removeLast(), // ✅ 랜덤한 사이즈 사용 후 제거
+                                  imagePath: _selectedOOTD!.outer!,
+                                  onTap: () => _showCircleModal(context, _selectedOOTD!.outer!),
+                                ),
+                              ),
+                            if (_selectedOOTD?.top != null)
+                              Transform.translate(
+                                offset: const Offset(70, -100),
+                                child: CircleImageWidget(
+                                  size: availableSizes.removeLast(),
+                                  imagePath: _selectedOOTD!.top!,
+                                  onTap: () => _showCircleModal(context, _selectedOOTD!.top!),
+                                ),
+                              ),
+                            if (_selectedOOTD?.bottom != null)
+                              Transform.translate(
+                                offset: const Offset(-60, 60),
+                                child: CircleImageWidget(
+                                  size: availableSizes.removeLast(),
+                                  imagePath: _selectedOOTD!.bottom!,
+                                  onTap: () => _showCircleModal(context, _selectedOOTD!.bottom!),
+                                ),
+                              ),
+                            if (_selectedOOTD?.shoes != null)
+                              Transform.translate(
+                                offset: const Offset(60, 30),
+                                child: CircleImageWidget(
+                                  size: availableSizes.removeLast(),
+                                  imagePath: _selectedOOTD!.shoes!,
+                                  onTap: () => _showCircleModal(context, _selectedOOTD!.shoes!),
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  margin: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 10.0),
-                  child: Text(
-                    _selectedOOTD?.reason ?? "추천 이유 없음", //  DTO에서 코멘트 가져오기
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Color(0xFF252525),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                ExpandableTextContainer(
+                  text: _selectedOOTD?.reason ?? "추천 이유 없음",
                 ),
+
               ],
             ),
           );
