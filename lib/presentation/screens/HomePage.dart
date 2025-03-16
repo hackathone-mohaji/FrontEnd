@@ -17,14 +17,15 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentIndex = index;
     });
-    _pageController.jumpToPage(index); // ✅ PageView의 페이지 변경
+    _pageController.jumpToPage(index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
-        controller: _pageController, // ✅ PageView 컨트롤러 연결
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
         children: const [
           Menu(),
           OotdPage(),
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 2, // ✅ 구분선 두께
+            height: 2,
             color: Colors.grey[300],
           ),
           BottomNavigationBar(

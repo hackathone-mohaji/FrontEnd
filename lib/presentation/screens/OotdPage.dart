@@ -10,26 +10,14 @@ class OotdPage extends StatefulWidget {
   @override
   _OotdPageState createState() => _OotdPageState();
 }
-
-class _OotdPageState extends State<OotdPage>
-    with SingleTickerProviderStateMixin {
+class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late PageController _pageController;
-  OotdDto _selectedOOTD = OotdDto(
-    outer: null,
-    top: null,
-    bottom: null,
-    shoes: null,
-    reason: "추천 이유 없음",
-    combinationId: 0,
-    bookmarked: false,
-    totalCount: 0,
-  );
-
-  bool _isLoading = true;
-
-
   final OotdController _controllerLogic = OotdController();
+
+  final List<OotdDto> _ootdList = []; // ✅ 데이터 저장 리스트
+  int _currentPageIndex = 0; // 현재 페이지 인덱스
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -37,91 +25,81 @@ class _OotdPageState extends State<OotdPage>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )
-      ..repeat(reverse: true);
+    )..repeat(reverse: true);
 
     _pageController = PageController();
-    _initializePage();
+    _initializeFirstPage();
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // ✅ 애니메이션 컨트롤러 해제
-    _pageController.dispose(); // ✅ 페이지 컨트롤러 해제
+    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
-  void _initializePage() async {
-    setState(() {
-      _isLoading = true; // ✅ API 호출 전 로딩 상태 활성화
+  // 첫 로딩 시 호출
+  void _initializeFirstPage() async {
+    setState(() => _isLoading = true);
+    await _fetchAndAddOotd();
+    setState(() => _isLoading = false);
+  }
 
-    });
-
+  // API로부터 데이터를 가져와 컬렉션에 추가
+  Future<void> _fetchAndAddOotd() async {
     try {
       final fetchedOOTD = await _controllerLogic.fetchOOTD();
       setState(() {
-        _selectedOOTD = fetchedOOTD;
-        _isLoading = false;
+        _ootdList.add(fetchedOOTD);
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('데이터 로드 중 에러 발생: $e')),
+      );
     }
   }
 
+  void _onPageChanged(int index) async {
+    _currentPageIndex = index;
 
-  void _onPageChanged(int index) {
-    _initializePage();
+    // 데이터가 부족하면 추가 로드
+    if (_currentPageIndex >= _ootdList.length - 1 && !_isLoading) {
+      setState(() => _isLoading = true);
+      await _fetchAndAddOotd();
+      setState(() => _isLoading = false);
+    }
   }
 
 
   void _showCircleModal(BuildContext context, String imagePath) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        child: Container(
+          width: 300,
+          height: 300,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(20.0),
           ),
-          child: Container(
-            width: 300,
-            height: 300,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Image.network(
-                    imagePath,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "이미지 상세 정보",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style:
-                  ElevatedButton.styleFrom(backgroundColor: Colors.white70),
-                  child:
-                  const Text("닫기", style: TextStyle(color: Colors.black87)),
-                ),
-              ],
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(child: Image.network(imagePath, fit: BoxFit.contain)),
+              const SizedBox(height: 10),
+              const Text("이미지 상세 정보", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.white70),
+                child: const Text("닫기", style: TextStyle(color: Colors.black87)),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -133,102 +111,94 @@ class _OotdPageState extends State<OotdPage>
         controller: _pageController,
         scrollDirection: Axis.vertical,
         onPageChanged: _onPageChanged,
-        physics: _isLoading
-            ? const NeverScrollableScrollPhysics()
-            : const BouncingScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
+          // 데이터가 현재 인덱스에 없으면 로딩을 표시
+          if (index >= _ootdList.length) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final ootd = _ootdList[index];
+
+          // 기존의 Widget 그대로 사용
           return SafeArea(
             child: Column(
               children: [
                 const Padding(
-                  padding:
-                  EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                  padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                   child: Column(
                     children: [
                       SizedBox(height: 20),
                       Text(
                         "Novowel의 추천",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF252525),
-                        ),
+                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF252525)),
                       ),
                     ],
                   ),
                 ),
                 const Spacer(),
-                _isLoading
-                    ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-                    : SizedBox(
+                SizedBox(
                   height: 300,
                   child: Align(
                     alignment: Alignment.center,
-                    child: Builder(
-                      builder: (context) {
-                        List<double> availableSizes = [70, 120, 100, 80]; // 중복 방지용 사이즈 리스트
-                        availableSizes.shuffle(); // ✅ 리스트를 랜덤하게 섞어서 중복되지 않게 함
+                    child: Builder(builder: (context) {
+                      List<double> availableSizes = [70, 120, 100, 80];
+                      availableSizes.shuffle();
 
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            if (_selectedOOTD?.outer != null)
-                              Transform.translate(
-                                offset: const Offset(-50, -60),
-                                child: CircleImageWidget(
-                                  size: availableSizes.removeLast(), // ✅ 랜덤한 사이즈 사용 후 제거
-                                  imagePath: _selectedOOTD!.outer!,
-                                  onTap: () => _showCircleModal(context, _selectedOOTD!.outer!),
-                                ),
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (ootd.outer != null)
+                            Transform.translate(
+                              offset: const Offset(-50, -60),
+                              child: CircleImageWidget(
+                                size: availableSizes.removeLast(),
+                                imagePath: ootd.outer!,
+                                onTap: () => _showCircleModal(context, ootd.outer!),
                               ),
-                            if (_selectedOOTD?.top != null)
-                              Transform.translate(
-                                offset: const Offset(70, -100),
-                                child: CircleImageWidget(
-                                  size: availableSizes.removeLast(),
-                                  imagePath: _selectedOOTD!.top!,
-                                  onTap: () => _showCircleModal(context, _selectedOOTD!.top!),
-                                ),
+                            ),
+                          if (ootd.top != null)
+                            Transform.translate(
+                              offset: const Offset(70, -100),
+                              child: CircleImageWidget(
+                                size: availableSizes.removeLast(),
+                                imagePath: ootd.top!,
+                                onTap: () => _showCircleModal(context, ootd.top!),
                               ),
-                            if (_selectedOOTD?.bottom != null)
-                              Transform.translate(
-                                offset: const Offset(-60, 60),
-                                child: CircleImageWidget(
-                                  size: availableSizes.removeLast(),
-                                  imagePath: _selectedOOTD!.bottom!,
-                                  onTap: () => _showCircleModal(context, _selectedOOTD!.bottom!),
-                                ),
+                            ),
+                          if (ootd.bottom != null)
+                            Transform.translate(
+                              offset: const Offset(-60, 60),
+                              child: CircleImageWidget(
+                                size: availableSizes.removeLast(),
+                                imagePath: ootd.bottom!,
+                                onTap: () => _showCircleModal(context, ootd.bottom!),
                               ),
-                            if (_selectedOOTD?.shoes != null)
-                              Transform.translate(
-                                offset: const Offset(60, 30),
-                                child: CircleImageWidget(
-                                  size: availableSizes.removeLast(),
-                                  imagePath: _selectedOOTD!.shoes!,
-                                  onTap: () => _showCircleModal(context, _selectedOOTD!.shoes!),
-                                ),
+                            ),
+                          if (ootd.shoes != null)
+                            Transform.translate(
+                              offset: const Offset(60, 30),
+                              child: CircleImageWidget(
+                                size: availableSizes.removeLast(),
+                                imagePath: ootd.shoes!,
+                                onTap: () => _showCircleModal(context, ootd.shoes!),
                               ),
-                          ],
-                        );
-                      },
-                    ),
+                            ),
+                        ],
+                      );
+                    }),
                   ),
                 ),
                 const Spacer(),
-                Visibility(
-                  visible: !_isLoading,
-                  child: ExpandableTextContainer(
-                    text: _selectedOOTD?.reason ?? "추천 이유 없음",
-                  ),
+                ExpandableTextContainer(
+                  text: ootd.reason ?? "추천 이유 없음",
                 ),
-
               ],
             ),
           );
         },
       ),
+
     );
   }
 }
