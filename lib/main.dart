@@ -3,9 +3,17 @@ import 'package:camfit/presentation/screens/HomePage.dart';
 import 'package:camfit/presentation/screens/OotdPage.dart'; 
 import 'package:camfit/presentation/screens/ProfilePage.dart'; 
 import 'package:camfit/presentation/screens/LoginPage.dart'; 
-import 'package:camfit/presentation/screens/SignupPage.dart'; 
-void main() {
-  runApp(const MyApp());
+import 'package:camfit/presentation/screens/SignupPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await clearAccessTokenOnStartup(); // 앱 시작 시 엑세스 토큰 삭제
+  runApp(MyApp());
+}
+
+Future<void> clearAccessTokenOnStartup() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove('accessToken'); // 저장된 엑세스 토큰 삭제
 }
 
 class MyApp extends StatelessWidget {
