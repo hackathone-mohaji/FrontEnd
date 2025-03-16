@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/ProfileController.dart';
+import 'package:camfit/data/repositories/AuthRepository.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
-
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -50,6 +50,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _logout() async {
+    await AuthRepository().logout();
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             GestureDetector(
               onTap: _updateProfilePhoto,
@@ -75,6 +83,18 @@ class _ProfilePageState extends State<ProfilePage> {
             Text(
               _username != null ? "$_username님, 안녕하세요!" : "불러오는 중...",
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 50),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              onPressed: _logout,
+              child: const Text(
+                '로그아웃',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         ),

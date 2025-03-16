@@ -5,7 +5,8 @@ import 'package:camfit/data/models/OotdDto.dart';
 
 
 class OotdRepository {
-  final String _baseUrl = 'http://182.214.198.108:8888/wear';
+ final String _baseUrl = 'http://182.214.198.108:8888/wear';
+
 
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
