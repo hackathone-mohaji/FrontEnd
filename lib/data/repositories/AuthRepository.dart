@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:camfit/core/Constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepository {
-  final String _baseUrl = 'http://182.214.198.108:8888/auth';
+  final String _baseUrl = '${Constants.baseUrl}/auth';
+
 
   ///로그인///
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -104,31 +106,5 @@ class AuthRepository {
     await prefs.remove('refreshToken');
   }
 
-  // API 요청용 (자동 토큰 리프레시 처리)
-  Future<http.Response> getAuthorized(String url) async {
-    final prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('accessToken') ?? '';
 
-    var response = await http.get(
-      Uri.parse(url),
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-
-    if (response.statusCode == 401) {
-      bool refreshed = await reissueToken();
-
-      if (refreshed) {
-        // 재발급된 토큰 사용하여 다시 요청
-        final newAccessToken = prefs.getString('accessToken')!;
-        response = await http.get(
-          Uri.parse(url),
-          headers: {'Authorization': 'Bearer $newAccessToken'},
-        );
-      } else {
-        // 재발급 실패하면 로그아웃 처리
-        await logout();
-      }
-    }
-    return response;
-  }
 }

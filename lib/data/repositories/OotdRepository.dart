@@ -1,43 +1,42 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:camfit/core/HttpClient.dart';
 import 'package:camfit/data/models/OotdDto.dart';
-
+import 'package:flutter/material.dart';
 
 class OotdRepository {
- final String _baseUrl = 'http://182.214.198.108:8888/wear';
+  final HttpClient _httpClient = HttpClient();
+  final String _endPoint = '/wear';
 
-
-  Future<String?> _getAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('accessToken');
-  }
-
-  Future<OotdDto> getRandomOOTD() async {
+  /// 랜덤 조합 추천 ///
+  Future<OotdDto> getRandomOOTD({required BuildContext context}) async {
     try {
-      final String? accessToken = await _getAccessToken();
-      if (accessToken == null) {
-        throw Exception("Access Token 없음. 로그인 필요");
-      }
-
-      final response = await http.patch(
-        Uri.parse(_baseUrl),
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $accessToken",
-        },
-      );
+      final response = await _httpClient.patch(_endPoint, context: context);
 
       final decodedBody = utf8.decode(response.bodyBytes);
       final Map<String, dynamic> responseData = jsonDecode(decodedBody);
 
       if (response.statusCode == 200) {
-        return OotdDto.fromJson(responseData); // ✅ DTO 반환
+        return OotdDto.fromJson(responseData);
       } else {
         throw Exception(responseData['message'] ?? "OOTD 데이터 요청 실패");
       }
     } catch (e) {
       throw Exception("OOTD 데이터를 불러오는 중 오류 발생: $e");
+    }
+  }
+
+  /// 내 옷 목록 불러오기 ///
+  Future<List<OotdDto>> getMyWearList({required BuildContext context}) async {
+    final response = await _httpClient.get(_endPoint, context: context);
+
+    final decodedBody = utf8.decode(response.bodyBytes);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(decodedBody);
+      return data.map((json) => OotdDto.fromJson(json)).toList();
+    } else {
+      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 데이터 불러오기 실패';
+      throw Exception(errorMessage);
     }
   }
 }

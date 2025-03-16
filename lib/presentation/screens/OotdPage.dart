@@ -48,7 +48,7 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
   // API로부터 데이터를 가져와 컬렉션에 추가
   Future<void> _fetchAndAddOotd() async {
     try {
-      final fetchedOOTD = await _controllerLogic.fetchOOTD();
+      final fetchedOOTD = await _controllerLogic.fetchOOTD(context: context);
       setState(() {
         _ootdList.add(fetchedOOTD);
       });
