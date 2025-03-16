@@ -39,7 +39,13 @@ class HttpClient {
     if (_isTokenExpired(response)) {
       bool refreshed = await AuthRepository().reissueToken();
       if (refreshed) {
-        accessToken = prefs.getString('accessToken')!;
+        prefs.reload(); // SharedPreferences 최신화
+        accessToken = prefs.getString('accessToken');
+
+        if (accessToken == null || accessToken.isEmpty) {
+          throw Exception("리프레시 토큰으로 새 액세스 토큰을 받았으나 저장되지 않았습니다.");
+        }
+
         response = await _makeRequest(method, endpoint, token: accessToken, body: body);
       } else {
         await AuthRepository().logout();
