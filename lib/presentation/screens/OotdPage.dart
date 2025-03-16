@@ -28,6 +28,7 @@ class _OotdPageState extends State<OotdPage>
 
   bool _isLoading = true;
 
+
   final OotdController _controllerLogic = OotdController();
 
   @override
@@ -53,14 +54,23 @@ class _OotdPageState extends State<OotdPage>
   void _initializePage() async {
     setState(() {
       _isLoading = true; // ✅ API 호출 전 로딩 상태 활성화
+
     });
 
-    final fetchedOOTD = await _controllerLogic.fetchOOTD(); // ✅ 비동기 호출
-
-    setState(() {
-      _selectedOOTD = fetchedOOTD; // 데이터가 도착한 후 상태 업데이트
-      _isLoading = false; // ✅ 데이터가 도착하면 로딩 상태 해제
-    });
+    try {
+      final fetchedOOTD = await _controllerLogic.fetchOOTD();
+      setState(() {
+        _selectedOOTD = fetchedOOTD;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      });
+    }
   }
 
 
@@ -207,8 +217,11 @@ class _OotdPageState extends State<OotdPage>
                   ),
                 ),
                 const Spacer(),
-                ExpandableTextContainer(
-                  text: _selectedOOTD?.reason ?? "추천 이유 없음",
+                Visibility(
+                  visible: !_isLoading,
+                  child: ExpandableTextContainer(
+                    text: _selectedOOTD?.reason ?? "추천 이유 없음",
+                  ),
                 ),
 
               ],
