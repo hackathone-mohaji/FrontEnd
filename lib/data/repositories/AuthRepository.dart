@@ -93,7 +93,6 @@ class AuthRepository {
       await prefs.setString('accessToken', data['accessToken']);
       return true;
     } else {
-      await logout(); // 실패하면 로그아웃
       return false;
     }
   }
