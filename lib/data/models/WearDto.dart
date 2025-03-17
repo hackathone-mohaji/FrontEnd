@@ -6,8 +6,8 @@ class WearDto {
 
   factory WearDto.fromJson(Map<String, dynamic> json) {
     return WearDto(
-      wearId: json['wearId'],
-      wearImageUrl: json['wearImageUrl'],
+      wearId: json['wearId'] is int ? json['wearId'] : int.tryParse(json['wearId'].toString()) ?? 0, // 변환은 여기에서 처리
+      wearImageUrl: json['wearImageUrl'] ?? '', // null 방지
     );
   }
 
