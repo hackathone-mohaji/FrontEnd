@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:camfit/core/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camfit/data/repositories/AuthRepository.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+
 /// 로그인된 사용자의 api 요청///
 class HttpClient {
   static final HttpClient _instance = HttpClient._internal();
@@ -17,24 +20,27 @@ class HttpClient {
     return _sendRequest('GET', endpoint, context: context);
   }
 
-  Future<http.Response> post(String endpoint, {dynamic body, required BuildContext context}) async {
-    return _sendRequest('POST', endpoint, body: body, context: context);
+  Future<http.Response> post(String endpoint, {dynamic body, List<File>? files, required BuildContext context}) async {
+    return _sendRequest('POST', endpoint, body: body, files: files, context: context);
   }
 
-  Future<http.Response> patch(String endpoint, {dynamic body, required BuildContext context}) async {
-    return _sendRequest('PATCH', endpoint, body: body, context: context);
+  Future<http.Response> patch(String endpoint, {dynamic body, List<File>? files, required BuildContext context}) async {
+    return _sendRequest('PATCH', endpoint, body: body, files: files, context: context);
   }
 
   Future<http.Response> _sendRequest(
       String method,
       String endpoint, {
         dynamic body,
+        List<File>? files,
         required BuildContext context,
       }) async {
     final prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
-    var response = await _makeRequest(method, endpoint, token: accessToken, body: body);
+    var response = (files != null && files.isNotEmpty)
+        ? await _makeMultipartRequest(method, endpoint, token: accessToken, body: body, files: files)
+        : await _makeRequest(method, endpoint, token: accessToken, body: body);
 
     if (_isTokenExpired(response)) {
       bool refreshed = await AuthRepository().reissueToken();
@@ -46,7 +52,9 @@ class HttpClient {
           throw Exception("리프레시 토큰으로 새 액세스 토큰을 받았으나 저장되지 않았습니다.");
         }
 
-        response = await _makeRequest(method, endpoint, token: accessToken, body: body);
+        response = (files != null && files.isNotEmpty)
+            ? await _makeMultipartRequest(method, endpoint, token: accessToken, body: body, files: files)
+            : await _makeRequest(method, endpoint, token: accessToken, body: body);
       } else {
         await AuthRepository().logout();
         if (context.mounted) {
@@ -77,6 +85,40 @@ class HttpClient {
       default:
         throw UnsupportedError("지원되지 않는 HTTP 메소드입니다.");
     }
+  }
+
+  Future<http.Response> _makeMultipartRequest(
+      String method, String endpoint, {
+        String? token,
+        dynamic body,
+        required List<File> files,
+      }) async {
+    final uri = Uri.parse('$baseUrl$endpoint');
+    final request = http.MultipartRequest(method, uri);
+
+    // Authorization 헤더 추가
+    if (token != null) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+
+    // JSON 데이터 추가 (옵션)
+    if (body != null) {
+      request.fields['json'] = jsonEncode(body);
+    }
+
+    // 파일 추가
+    for (var file in files) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'files', // 서버에서 받을 필드명 (백엔드와 협의 필요)
+        file.path,
+        filename: basename(file.path),
+      ));
+    }
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    return response;
   }
 
   bool _isTokenExpired(http.Response response) {

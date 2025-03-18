@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:camfit/core/HttpClient.dart';
 import 'package:camfit/data/models/OotdDto.dart';
 import 'package:camfit/data/models/WearDto.dart';
@@ -51,5 +52,25 @@ class OotdRepository {
       throw Exception(errorMessage);
     }
   }
+
+
+
+  /// 내 옷 등록하기 ///
+  Future<void> addMyWearList({
+    required BuildContext context, required List<File> files}) async {
+    final response = await _httpClient.post(_endPoint,files: files,
+        context: context);
+
+    final decodedBody = utf8.decode(response.bodyBytes);
+    debugPrint("Decoded Response: $decodedBody"); // 디버깅용 출력
+
+    if (response.statusCode != 200) {
+      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 데이터 등록 실패';
+      throw Exception(errorMessage);
+    }
+  }
+
+
+
 
 }
