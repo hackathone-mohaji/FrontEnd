@@ -1,4 +1,4 @@
-import 'package:camfit/presentation/screens/Menu.dart';
+import 'package:camfit/presentation/screens/UploadOutfitPage.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/screens/OotdPage.dart';
 import 'package:camfit/presentation/screens/ProfilePage.dart';
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         children: const [
-          Menu(),
+          UploadOutfitPage(),
           OotdPage(),
           ProfilePage(),
         ],
@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-              icon: const Icon(Icons.menu, size: 30),
+              icon: const Icon(Icons.add_a_photo, size: 34),
               onPressed: () => _onTabTapped(0),
             ),
             IconButton(
@@ -53,8 +53,8 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => _onTabTapped(1),
               icon: Image.asset(
                 'assets/novowel.png',
-                width: 50,
-                height: 50,
+                width: 54,
+                height: 54,
               ),
             ),
             IconButton(

@@ -1,14 +1,14 @@
 import 'package:camfit/data/repositories/AuthRepository.dart';
 import 'package:flutter/material.dart';
 
-class Menu extends StatefulWidget {
-  const Menu({super.key});
+class MenuPage extends StatefulWidget {
+  const MenuPage({super.key});
 
   @override
-  State<Menu> createState() => _MenuState();
+  State<MenuPage> createState() => _MenuPageState();
 }
 
-class _MenuState extends State<Menu> {
+class _MenuPageState extends State<MenuPage> {
   Future<void> _logout() async {
     await AuthRepository().logout();
     if (context.mounted) {

@@ -1,3 +1,4 @@
+import 'package:camfit/presentation/widgets/CustomAppBar.dart';
 import 'package:camfit/presentation/widgets/ExpandableTextContainer.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
@@ -10,7 +11,9 @@ class OotdPage extends StatefulWidget {
   @override
   _OotdPageState createState() => _OotdPageState();
 }
-class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin {
+
+class _OotdPageState extends State<OotdPage>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late PageController _pageController;
   final OotdController _controllerLogic = OotdController();
@@ -70,12 +73,12 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
     }
   }
 
-
   void _showCircleModal(BuildContext context, String imagePath) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
         child: Container(
           width: 300,
           height: 300,
@@ -89,12 +92,15 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
             children: [
               Expanded(child: Image.network(imagePath, fit: BoxFit.contain)),
               const SizedBox(height: 10),
-              const Text("이미지 상세 정보", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Text("이미지 상세 정보",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.white70),
-                child: const Text("닫기", style: TextStyle(color: Colors.black87)),
+                style:
+                    ElevatedButton.styleFrom(backgroundColor: Colors.white70),
+                child:
+                    const Text("닫기", style: TextStyle(color: Colors.black87)),
               ),
             ],
           ),
@@ -106,6 +112,16 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBar(
+        title: Text(
+          "Novowel의 추천",
+          style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF252525)),
+        ),
+        centerTitle: true,
+      ),
       backgroundColor: const Color(0xFFFFFFFF),
       body: PageView.builder(
         controller: _pageController,
@@ -125,14 +141,11 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
             child: Column(
               children: [
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
                   child: Column(
                     children: [
                       SizedBox(height: 20),
-                      Text(
-                        "Novowel의 추천",
-                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Color(0xFF252525)),
-                      ),
                     ],
                   ),
                 ),
@@ -154,7 +167,8 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
                               child: CircleImageWidget(
                                 size: availableSizes.removeLast(),
                                 imagePath: ootd.outer!,
-                                onTap: () => _showCircleModal(context, ootd.outer!),
+                                onTap: () =>
+                                    _showCircleModal(context, ootd.outer!),
                               ),
                             ),
                           if (ootd.top != null)
@@ -163,7 +177,8 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
                               child: CircleImageWidget(
                                 size: availableSizes.removeLast(),
                                 imagePath: ootd.top!,
-                                onTap: () => _showCircleModal(context, ootd.top!),
+                                onTap: () =>
+                                    _showCircleModal(context, ootd.top!),
                               ),
                             ),
                           if (ootd.bottom != null)
@@ -172,7 +187,8 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
                               child: CircleImageWidget(
                                 size: availableSizes.removeLast(),
                                 imagePath: ootd.bottom!,
-                                onTap: () => _showCircleModal(context, ootd.bottom!),
+                                onTap: () =>
+                                    _showCircleModal(context, ootd.bottom!),
                               ),
                             ),
                           if (ootd.shoes != null)
@@ -181,7 +197,8 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
                               child: CircleImageWidget(
                                 size: availableSizes.removeLast(),
                                 imagePath: ootd.shoes!,
-                                onTap: () => _showCircleModal(context, ootd.shoes!),
+                                onTap: () =>
+                                    _showCircleModal(context, ootd.shoes!),
                               ),
                             ),
                         ],
@@ -198,7 +215,6 @@ class _OotdPageState extends State<OotdPage> with SingleTickerProviderStateMixin
           );
         },
       ),
-
     );
   }
 }

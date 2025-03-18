@@ -1,4 +1,5 @@
 import 'package:camfit/data/models/WearDto.dart';
+import 'package:camfit/presentation/widgets/CustomAppBar.dart';
 import 'package:camfit/presentation/widgets/WearGrid.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/ProfileController.dart';
@@ -75,10 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text("Profile"),
-        backgroundColor: Colors.white,
-      ),
+      appBar: const CustomAppBar(title:Text("Profile")),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -114,7 +112,8 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.47,
                 child: WearGrid(wearList: _wearList),
