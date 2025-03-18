@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
 import 'package:camfit/presentation/widgets/CustomAppBar.dart';
 import 'package:camfit/presentation/widgets/WearGrid.dart';
@@ -84,8 +85,8 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: _updateProfilePhoto,
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _profilePhotoUrl != null
-                    ? NetworkImage(_profilePhotoUrl!) as ImageProvider
+                backgroundImage: _profilePhotoUrl != null && _profilePhotoUrl!.isNotEmpty
+                    ? CachedNetworkImageProvider(_profilePhotoUrl!) as ImageProvider
                     : const AssetImage("assets/profile.png"),
               ),
             ),

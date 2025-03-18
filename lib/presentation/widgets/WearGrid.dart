@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
 import 'package:flutter/material.dart';
 
@@ -25,15 +26,13 @@ class WearGrid extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(5),
-            child: Image.network(
-              wear.wearImageUrl,
+            child: CachedNetworkImage(
+              imageUrl: wear.wearImageUrl,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Icon(Icons.error_outline, color: Colors.grey),
-                );
-              },
-            ),
+              errorWidget: (context, url, error) => const Center( // 👈 에러 발생 시 UI
+                child: Icon(Icons.error_outline, color: Colors.grey, size: 40),
+              ),
+            )
           ),
         );
       },

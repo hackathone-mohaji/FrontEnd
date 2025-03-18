@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class CircleImageWidget extends StatelessWidget {
@@ -29,7 +30,7 @@ class CircleImageWidget extends StatelessWidget {
             ),
           ],
           image: DecorationImage(
-            image: NetworkImage(imagePath),
+            image: CachedNetworkImageProvider(imagePath),
             fit: BoxFit.cover,
           ),
         ),
