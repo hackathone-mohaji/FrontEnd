@@ -22,6 +22,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UploadOutfitPage()),
+      );
+
+      if (result != null && result is int) {
+        setState(() {
+          _currentIndex = result; // 👈 전달받은 페이지 인덱스로 이동
+          _pageController.jumpToPage(result);
+        });
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(

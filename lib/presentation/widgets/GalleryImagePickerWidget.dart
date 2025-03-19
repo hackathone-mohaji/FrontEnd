@@ -9,13 +9,14 @@ class GalleryImagePickerWidget extends StatefulWidget {
   const GalleryImagePickerWidget({super.key, required this.onImageSelected});
 
   @override
-  State<GalleryImagePickerWidget> createState() => _GalleryImagePickerWidgetState();
+  State<GalleryImagePickerWidget> createState() =>
+      _GalleryImagePickerWidgetState();
 }
 
 class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
   final ScrollController _scrollController = ScrollController();
   List<AssetEntity> _galleryImages = [];
-  Map<int, File?> _imageCache = {}; // ✅ 이미지 캐싱 추가
+  Map<int, File?> _imageCache = {}; // ✅ Future<File?> -> File? 로 변경
   bool _isLoading = false;
   int _currentPage = 0;
   static const int _pageSize = 30;
@@ -35,7 +36,8 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
 
   /// ✅ 갤러리 권한 요청
   Future<void> _requestGalleryPermission() async {
-    final PermissionState permission = await PhotoManager.requestPermissionExtend();
+    final PermissionState permission =
+        await PhotoManager.requestPermissionExtend();
     if (permission.hasAccess) {
       _loadGalleryImages();
     }
@@ -46,7 +48,8 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
     if (_isLoading) return;
     setState(() => _isLoading = true);
 
-    final List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(type: RequestType.image);
+    final List<AssetPathEntity> albums =
+        await PhotoManager.getAssetPathList(type: RequestType.image);
 
     if (albums.isNotEmpty) {
       final List<AssetEntity> images = await albums.first.getAssetListPaged(
@@ -54,31 +57,32 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
         size: _pageSize,
       );
 
-      for (int i = 0; i < images.length; i++) {
-        _cacheImage(i + (_currentPage * _pageSize), images[i]); // ✅ 미리 캐싱
-      }
-
       setState(() {
         _galleryImages.addAll(images);
         _currentPage++;
-        _isLoading = false;
       });
-    }
-  }
 
-  /// ✅ 개별 이미지 캐싱
-  Future<void> _cacheImage(int index, AssetEntity entity) async {
-    final File? file = await entity.file;
-    if (file != null) {
-      setState(() {
-        _imageCache[index] = file;
-      });
+      // ✅ 새로운 이미지만 캐싱
+      for (int i = 0; i < images.length; i++) {
+        int index = i + ((_currentPage - 1) * _pageSize);
+        if (!_imageCache.containsKey(index)) {
+          images[i].file.then((file) {
+            if (file != null) {
+              setState(() {
+                _imageCache[index] = file;
+              });
+            }
+          });
+        }
+      }
     }
+    setState(() => _isLoading = false);
   }
 
   /// ✅ 스크롤할 때 추가 이미지 로드
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 100) {
       _loadGalleryImages();
     }
   }
@@ -94,37 +98,65 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          const Text("갤러리에서 이미지 선택", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text("갤러리에서 이미지 선택",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Expanded(
             child: _galleryImages.isEmpty
                 ? const Center(child: Text("갤러리에 이미지가 없습니다."))
                 : GridView.builder(
-              controller: _scrollController,
-              itemCount: _galleryImages.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // ✅ 3열로 정렬
-                crossAxisSpacing: 0, // ✅ 가로 간격 제거
-                mainAxisSpacing: 0, // ✅ 세로 간격 제거
-              ),
-              itemBuilder: (context, index) {
-                final File? file = _imageCache[index]; // ✅ 캐싱된 이미지 가져오기
-
-                if (file == null) {
-                  return const SizedBox(); // ✅ 로딩 중에는 빈 컨테이너 (로딩 UI 제거)
-                }
-
-                return GestureDetector(
-                  onTap: () {
-                    widget.onImageSelected(XFile(file.path));
-                  },
-                  child: Image.file(
-                    file,
-                    fit: BoxFit.cover, // ✅ 이미지가 빈 공간 없이 꽉 차도록 설정
+                    controller: _scrollController,
+                    itemCount: _galleryImages.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // ✅ 3열로 정렬
+                      crossAxisSpacing: 0, // ✅ 가로 간격 제거
+                      mainAxisSpacing: 0, // ✅ 세로 간격 제거
+                    ),
+                    itemBuilder: (context, index) {
+                      if (_imageCache.containsKey(index) &&
+                          _imageCache[index] != null) {
+                        return GestureDetector(
+                          onTap: () {
+                            widget.onImageSelected(
+                                XFile(_imageCache[index]!.path));
+                          },
+                          child: Image.file(
+                            _imageCache[index]!,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      } else {
+                        // ✅ FutureBuilder를 사용하여 비동기 호출을 최소화
+                        return FutureBuilder<File?>(
+                          future: _galleryImages[index].file,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                snapshot.hasData) {
+                              // ✅ 캐싱 후 즉시 사용
+                              _imageCache[index] = snapshot.data;
+                              return GestureDetector(
+                                onTap: () {
+                                  widget.onImageSelected(
+                                      XFile(snapshot.data!.path));
+                                },
+                                child: Image.file(
+                                  snapshot.data!,
+                                  fit: BoxFit.cover,
+                                ),
+                              );
+                            } else {
+                              // ✅ 로딩 중에는 회색 컨테이너 표시
+                              return Container(
+                                color: Colors.grey[300],
+                              );
+                            }
+                          },
+                        );
+                      }
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

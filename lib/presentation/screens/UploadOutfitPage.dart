@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
 import 'package:camfit/presentation/widgets/GalleryImagePickerWidget.dart';
-import 'package:camfit/presentation/screens/ProfilePage.dart';
 
 class UploadOutfitPage extends StatefulWidget {
   const UploadOutfitPage({super.key});
@@ -43,10 +42,9 @@ class _UploadOutfitPageState extends State<UploadOutfitPage>
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("이미지 업로드 성공!")),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()),
-      );
+
+      // ✅ 현재 페이지에서 뒤로 가면서 ProfilePage로 보이게 설정
+      Navigator.pop(context, 2);  // 👈 '2'를 반환해서 ProfilePage로 이동하도록 전달
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("업로드 실패: $e")),
@@ -55,6 +53,7 @@ class _UploadOutfitPageState extends State<UploadOutfitPage>
       setState(() => _isUploading = false); // ✅ 업로드 완료 후 로딩 해제
     }
   }
+
 
   void _onVerticalDragUpdate(DragUpdateDetails details) {
     setState(() {
@@ -150,7 +149,7 @@ class _UploadOutfitPageState extends State<UploadOutfitPage>
                 onVerticalDragUpdate: _onVerticalDragUpdate,
                 onVerticalDragEnd: _onVerticalDragEnd,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
+                  duration: const Duration(milliseconds: 150),
                   height: MediaQuery.of(context).size.height * _galleryHeight,
                   child: GalleryImagePickerWidget(onImageSelected: _onImageSelected),
                 ),
