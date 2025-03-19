@@ -33,6 +33,9 @@ class _MenuPageState extends State<MenuPage> {
                   backgroundColor: Colors.redAccent,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0), // 👈 모서리 둥글기 제거
+                  ),
                 ),
                 onPressed: _logout,
                 child: const Text(
