@@ -1,3 +1,4 @@
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
 import 'package:camfit/presentation/widgets/CustomAppBar.dart';
@@ -77,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(title:Text("Profile")),
+      appBar: const CustomAppBar(title: Text("Profile")),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -113,11 +114,13 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.47,
-                child: WearGrid(wearList: _wearList),
+                child: WearGrid(
+                  wearList: _wearList,
+                  category: _selectedCategory, // 선택된 카테고리를 전달
+                ),
               ),
             ),
           ],
@@ -138,9 +141,9 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor:
-              _selectedCategory == category ? Colors.black : Colors.grey[300],
+          _selectedCategory == category ? Colors.black : Colors.grey[300],
           foregroundColor:
-              _selectedCategory == category ? Colors.white : Colors.black,
+          _selectedCategory == category ? Colors.white : Colors.black,
         ),
         child: Text(category),
       ),
