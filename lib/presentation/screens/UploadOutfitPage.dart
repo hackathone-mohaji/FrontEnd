@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_manager/photo_manager.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
 import 'package:camfit/presentation/widgets/GalleryImagePickerWidget.dart';
 
@@ -11,56 +13,65 @@ class UploadOutfitPage extends StatefulWidget {
   State<UploadOutfitPage> createState() => _UploadOutfitPageState();
 }
 
-class _UploadOutfitPageState extends State<UploadOutfitPage>
-    with SingleTickerProviderStateMixin {
+class _UploadOutfitPageState extends State<UploadOutfitPage> with SingleTickerProviderStateMixin {
   final OotdController _controller = OotdController();
-  List<XFile> _selectedImages = [];
-  bool _isUploading = false; // ✅ 업로드 중인지 여부
+  List<AssetEntity> _selectedImages = [];
+  Map<String, Uint8List?> _thumbnailCache = {};
+  bool _isUploading = false;
   double _galleryHeight = 0.5;
   double _minGalleryHeight = 0.055;
   double _maxGalleryHeight = 0.5;
   bool _isGalleryExpanded = true;
 
-  void _onImageSelected(XFile image) {
+  void _onImageSelected(AssetEntity entity) async {
+    Uint8List? thumbnail = await entity.thumbnailDataWithSize(const ThumbnailSize(200, 200));
+
     setState(() {
-      if (_selectedImages.contains(image)) {
-        _selectedImages.remove(image); // ✅ 선택된 이미지 터치 시 삭제
+      if (_selectedImages.contains(entity)) {
+        _selectedImages.remove(entity);
+        _thumbnailCache.remove(entity.id);
       } else {
-        _selectedImages.add(image);
+        _selectedImages.insert(0, entity);
+        _thumbnailCache[entity.id] = thumbnail;
       }
     });
   }
 
+  Future<List<File>> _getOriginalFiles() async {
+    List<File> files = [];
+    for (var entity in _selectedImages) {
+      File? file = await entity.file;
+      if (file != null) {
+        files.add(file);
+      }
+    }
+    return files;
+  }
+
   Future<void> _uploadImages() async {
     if (_selectedImages.isEmpty) return;
+    setState(() => _isUploading = true);
 
-    setState(() => _isUploading = true); // ✅ 업로드 시작 시 로딩 표시
-
-    List<File> files = _selectedImages.map((e) => File(e.path)).toList();
+    List<File> files = await _getOriginalFiles();
     try {
       await _controller.addMyWearList(context: context, files: files);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("이미지 업로드 성공!")),
       );
-
-      // ✅ 현재 페이지에서 뒤로 가면서 ProfilePage로 보이게 설정
-      Navigator.pop(context, 2);  // 👈 '2'를 반환해서 ProfilePage로 이동하도록 전달
+      Navigator.pop(context, 2);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("업로드 실패: $e")),
       );
     } finally {
-      setState(() => _isUploading = false); // ✅ 업로드 완료 후 로딩 해제
+      setState(() => _isUploading = false);
     }
   }
 
-
   void _onVerticalDragUpdate(DragUpdateDetails details) {
     setState(() {
-      _galleryHeight -=
-          details.primaryDelta! / MediaQuery.of(context).size.height;
-      _galleryHeight =
-          _galleryHeight.clamp(_minGalleryHeight, _maxGalleryHeight);
+      _galleryHeight -= details.primaryDelta! / MediaQuery.of(context).size.height;
+      _galleryHeight = _galleryHeight.clamp(_minGalleryHeight, _maxGalleryHeight);
     });
   }
 
@@ -92,10 +103,9 @@ class _UploadOutfitPageState extends State<UploadOutfitPage>
                     ? null
                     : () async {
                   final ImagePicker picker = ImagePicker();
-                  final XFile? image =
-                  await picker.pickImage(source: ImageSource.camera);
+                  final XFile? image = await picker.pickImage(source: ImageSource.camera);
                   if (image != null) {
-                    _onImageSelected(image);
+                    _onImageSelected(await PhotoManager.editor.saveImageWithPath(image.path));
                   }
                 },
               ),
@@ -108,57 +118,50 @@ class _UploadOutfitPageState extends State<UploadOutfitPage>
                     ? const Center(child: Text("이미지를 선택하세요."))
                     : GridView.builder(
                   itemCount: _selectedImages.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 0, // ✅ 간격 없앰
-                    mainAxisSpacing: 0,  // ✅ 간격 없앰
+                    crossAxisSpacing: 2,
+                    mainAxisSpacing: 2,
+                    childAspectRatio: 1,
                   ),
                   itemBuilder: (context, index) {
+                    AssetEntity entity = _selectedImages[index];
+                    Uint8List? thumbnail = _thumbnailCache[entity.id];
                     return GestureDetector(
-                      onTap: () => _onImageSelected(_selectedImages[index]),
-                      child: Image.file(
-                        File(_selectedImages[index].path),
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
+                      onTap: () => _onImageSelected(entity),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: thumbnail != null
+                            ? Image.memory(thumbnail, fit: BoxFit.cover)
+                            : Container(color: Colors.grey[300]),
                       ),
                     );
                   },
                 ),
               ),
               ElevatedButton.icon(
-                onPressed: _isUploading ? null : _uploadImages, // ✅ 업로드 중이면 버튼 비활성화
+                onPressed: _isUploading ? null : _uploadImages,
                 icon: _isUploading
-                    ? const SizedBox(
-                  width: 18, // ✅ 팬딩 크기 축소
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
-                )
+                    ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
                     : const Icon(Icons.upload, color: Colors.black),
-                label: _isUploading
-                    ? const Text("업로드 중...")
-                    : const Text("업로드"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[300],
-                  foregroundColor: Colors.black,
-                ),
+                label: _isUploading ? const Text("업로드 중...") : const Text("업로드"),
               ),
-
               GestureDetector(
                 onVerticalDragUpdate: _onVerticalDragUpdate,
                 onVerticalDragEnd: _onVerticalDragEnd,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   height: MediaQuery.of(context).size.height * _galleryHeight,
-                  child: GalleryImagePickerWidget(onImageSelected: _onImageSelected),
+                  child: GalleryImagePickerWidget(
+                    onImageSelected: _onImageSelected,
+                    selectedImages: _selectedImages,
+                  ),
                 ),
               ),
             ],
           ),
         ),
-        if (_isUploading)
-          ModalBarrier(color: Colors.black54, dismissible: false), // ✅ 업로드 중 다른 동작 방지
+        if (_isUploading) ModalBarrier(color: Colors.black54, dismissible: false),
       ],
     );
   }
