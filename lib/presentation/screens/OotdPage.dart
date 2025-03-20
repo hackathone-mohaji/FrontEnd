@@ -1,5 +1,6 @@
 import 'package:camfit/presentation/widgets/CustomAppBar.dart';
 import 'package:camfit/presentation/widgets/ExpandableTextContainer.dart';
+import 'package:camfit/presentation/widgets/FloatingCircleImageWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/controller/OotdController.dart';
 import 'package:camfit/presentation/widgets/CircleImageWidget.dart';
@@ -112,16 +113,7 @@ class _OotdPageState extends State<OotdPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: Text(
-          "Novowel의 추천",
-          style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF252525)),
-        ),
-        centerTitle: true,
-      ),
+
       backgroundColor: const Color(0xFFFFFFFF),
       body: PageView.builder(
         controller: _pageController,
@@ -140,6 +132,25 @@ class _OotdPageState extends State<OotdPage>
           return SafeArea(
             child: Column(
               children: [
+                const Spacer(),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Novowel",
+                      style: TextStyle(
+                          fontSize: 35,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF252525)),
+                    ),Text(
+                      "의 추천",
+                      style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF252525)),
+                    ),
+                  ],
+                ),
                 const Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 30.0, vertical: 10.0),
@@ -162,44 +173,41 @@ class _OotdPageState extends State<OotdPage>
                         alignment: Alignment.center,
                         children: [
                           if (ootd.outer != null)
-                            Transform.translate(
-                              offset: const Offset(-50, -60),
-                              child: CircleImageWidget(
-                                size: availableSizes.removeLast(),
-                                imagePath: ootd.outer!,
-                                onTap: () =>
-                                    _showCircleModal(context, ootd.outer!),
-                              ),
+                            FloatingCircleImageWidget(
+                              size: availableSizes.removeLast(),
+                              imagePath: ootd.outer!,
+                              initialOffset: const Offset(-50, -60), // 초기 위치
+                              onTap: () =>
+                                  _showCircleModal(context, ootd.outer!),
                             ),
                           if (ootd.top != null)
-                            Transform.translate(
-                              offset: const Offset(70, -100),
-                              child: CircleImageWidget(
-                                size: availableSizes.removeLast(),
-                                imagePath: ootd.top!,
-                                onTap: () =>
-                                    _showCircleModal(context, ootd.top!),
-                              ),
+                            FloatingCircleImageWidget(
+                              size: availableSizes.removeLast(),
+                              imagePath: ootd.top!,
+                              initialOffset: const Offset(70, -100), // 초기 위치
+                              onTap: () => _showCircleModal(context, ootd.top!),
                             ),
                           if (ootd.bottom != null)
-                            Transform.translate(
-                              offset: const Offset(-60, 60),
-                              child: CircleImageWidget(
-                                size: availableSizes.removeLast(),
-                                imagePath: ootd.bottom!,
-                                onTap: () =>
-                                    _showCircleModal(context, ootd.bottom!),
-                              ),
+                            FloatingCircleImageWidget(
+                              size: availableSizes.removeLast(),
+                              imagePath: ootd.bottom!,
+                              initialOffset: const Offset(-60, 60), // 초기 위치
+                              onTap: () =>
+                                  _showCircleModal(context, ootd.bottom!),
                             ),
                           if (ootd.shoes != null)
-                            Transform.translate(
-                              offset: const Offset(60, 30),
-                              child: CircleImageWidget(
+                            /*CircleImageWidget(
                                 size: availableSizes.removeLast(),
                                 imagePath: ootd.shoes!,
                                 onTap: () =>
                                     _showCircleModal(context, ootd.shoes!),
-                              ),
+                              ),*/
+                            FloatingCircleImageWidget(
+                              size: availableSizes.removeLast(),
+                              imagePath: ootd.shoes!,
+                              initialOffset: const Offset(60, 30), // 초기 위치
+                              onTap: () =>
+                                  _showCircleModal(context, ootd.shoes!),
                             ),
                         ],
                       );

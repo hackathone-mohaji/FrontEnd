@@ -86,83 +86,88 @@ class _UploadOutfitPageState extends State<UploadOutfitPage> with SingleTickerPr
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            title: const Text("Register"),
-            backgroundColor: Colors.white,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.camera_alt),
-                onPressed: _isUploading
-                    ? null
-                    : () async {
-                  final ImagePicker picker = ImagePicker();
-                  final XFile? image = await picker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    _onImageSelected(await PhotoManager.editor.saveImageWithPath(image.path));
-                  }
-                },
-              ),
-            ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text("Register"),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.camera_alt),
+            onPressed: _isUploading
+                ? null
+                : () async {
+              final ImagePicker picker = ImagePicker();
+              final XFile? image = await picker.pickImage(source: ImageSource.camera);
+              if (image != null) {
+                _onImageSelected(await PhotoManager.editor.saveImageWithPath(image.path));
+              }
+            },
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: _selectedImages.isEmpty
-                    ? const Center(child: Text("이미지를 선택하세요."))
-                    : GridView.builder(
-                  itemCount: _selectedImages.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                    childAspectRatio: 1,
+        ],
+      ),
+      body: Column(
+        children: [
+
+          Expanded(
+            child: _selectedImages.isEmpty
+                ? const Center(child: Text("이미지를 선택하세요."))
+                : GridView.builder(
+              itemCount: _selectedImages.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 2,
+                mainAxisSpacing: 2,
+                childAspectRatio: 1,
+              ),
+              itemBuilder: (context, index) {
+                AssetEntity entity = _selectedImages[index];
+                Uint8List? thumbnail = _thumbnailCache[entity.id];
+                return GestureDetector(
+                  onTap: () => _onImageSelected(entity),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: thumbnail != null
+                        ? Image.memory(thumbnail, fit: BoxFit.cover)
+                        : Container(color: Colors.grey[300]),
                   ),
-                  itemBuilder: (context, index) {
-                    AssetEntity entity = _selectedImages[index];
-                    Uint8List? thumbnail = _thumbnailCache[entity.id];
-                    return GestureDetector(
-                      onTap: () => _onImageSelected(entity),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: thumbnail != null
-                            ? Image.memory(thumbnail, fit: BoxFit.cover)
-                            : Container(color: Colors.grey[300]),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: _isUploading ? null : _uploadImages,
-                icon: _isUploading
-                    ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
-                    : const Icon(Icons.upload, color: Colors.black),
-                label: _isUploading ? const Text("업로드 중...") : const Text("업로드"),
-              ),
-              GestureDetector(
-                onVerticalDragUpdate: _onVerticalDragUpdate,
-                onVerticalDragEnd: _onVerticalDragEnd,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  height: MediaQuery.of(context).size.height * _galleryHeight,
-                  child: GalleryImagePickerWidget(
-                    onImageSelected: _onImageSelected,
-                    selectedImages: _selectedImages,
-                  ),
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
-        ),
-        if (_isUploading) ModalBarrier(color: Colors.black54, dismissible: false),
-      ],
+
+
+          GestureDetector(
+            onVerticalDragUpdate: _onVerticalDragUpdate,
+            onVerticalDragEnd: _onVerticalDragEnd,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              height: MediaQuery.of(context).size.height * _galleryHeight,
+              child: GalleryImagePickerWidget(
+                onImageSelected: _onImageSelected,
+                selectedImages: _selectedImages,
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _isUploading ? null : _uploadImages,
+        backgroundColor: Colors.white,
+        icon: _isUploading
+            ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
+            : const Icon(Icons.upload, color: Colors.black),
+        label: _isUploading
+            ? const Text("업로드 중...")
+            : const Text("업로드", style: TextStyle(color: Colors.black)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
+
+
 }

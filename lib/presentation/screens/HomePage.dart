@@ -2,6 +2,7 @@ import 'package:camfit/presentation/screens/UploadOutfitPage.dart';
 import 'package:flutter/material.dart';
 import 'package:camfit/presentation/screens/OotdPage.dart';
 import 'package:camfit/presentation/screens/ProfilePage.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,7 +13,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 1;
-  final PageController _pageController = PageController(initialPage: 1);
+
+  //final PageController _pageController = PageController(initialPage: 1);
+
+  final List<Widget> _pages = [
+    const UploadOutfitPage(),
+    const OotdPage(),
+    const ProfilePage(),
+  ];
+
+/*
 
   void _onTabTapped(int index) {
     setState(() {
@@ -20,67 +30,40 @@ class _HomePageState extends State<HomePage> {
     });
     _pageController.jumpToPage(index);
   }
-
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() async {
-      final result = await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const UploadOutfitPage()),
-      );
-
-      if (result != null && result is int) {
-        setState(() {
-          _currentIndex = result; // 👈 전달받은 페이지 인덱스로 이동
-          _pageController.jumpToPage(result);
-        });
-      }
-    });
-  }
+*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          UploadOutfitPage(),
-          OotdPage(),
-          ProfilePage(),
-        ],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _pages,
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8), // 👈 수직 패딩만큼 조정 가능
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(color: Color(0xFFE0E0E0), width: 2),
+      bottomNavigationBar: SalomonBottomBar(
+        backgroundColor: Colors.white,
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: [
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.add_a_photo, size: 34),
+            title: const Text("upload"),
+            selectedColor: Colors.black,
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.add_a_photo, size: 34),
-              onPressed: () => _onTabTapped(0),
+          SalomonBottomBarItem(
+            icon: Image.asset(
+              'assets/novowel.png',
+              width: 54,
+              height: 54,
             ),
-            IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => _onTabTapped(1),
-              icon: Image.asset(
-                'assets/novowel.png',
-                width: 54,
-                height: 54,
-              ),
-            ),
-            IconButton(
-              onPressed: () => _onTabTapped(2),
-              icon: const Icon(Icons.person, size: 35),
-            ),
-          ],
-        ),
+            title: const Text("ootd"),
+            selectedColor: Colors.black,
+          ),
+          SalomonBottomBarItem(
+            icon: const Icon(Icons.person, size: 35),
+            title: const Text("profile"),
+            selectedColor: Colors.black,
+          ),
+        ],
       ),
     );
   }

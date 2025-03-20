@@ -90,9 +90,9 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
       ),
       child: Column(
         children: [
-          const SizedBox(height: 8),
-          const Text("갤러리에서 이미지 선택", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          const SizedBox(height: 11),
+          const Text("갤러리에서 이미지 선택", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 11),
           Expanded(
             child: _galleryImages.isEmpty
                 ? const Center(child: Text("갤러리에 이미지가 없습니다."))

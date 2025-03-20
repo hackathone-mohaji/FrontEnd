@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class ExpandableTextContainer extends StatefulWidget {
   final String text;
 
-  const ExpandableTextContainer({Key? key, required this.text}) : super(key: key);
+  const ExpandableTextContainer({Key? key, required this.text})
+      : super(key: key);
 
   @override
-  _ExpandableTextContainerState createState() => _ExpandableTextContainerState();
+  _ExpandableTextContainerState createState() =>
+      _ExpandableTextContainerState();
 }
 
 class _ExpandableTextContainerState extends State<ExpandableTextContainer> {
@@ -40,9 +42,19 @@ class _ExpandableTextContainerState extends State<ExpandableTextContainer> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("룩 설명"),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0), // 모서리 둥글게
+          ),
+          title: const Text(
+            "룩 설명",
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          backgroundColor: Colors.grey,
           content: SingleChildScrollView(
-            child: Text(widget.text), // 전체 텍스트 표시
+            child: Text(
+              widget.text,
+              style: const TextStyle(color: Colors.black87),
+            ), // 전체 텍스트 표시
           ),
         );
       },

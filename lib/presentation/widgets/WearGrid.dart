@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class WearGrid extends StatefulWidget {
   final List<WearDto> wearList;
@@ -20,14 +21,18 @@ class _WearGridState extends State<WearGrid> {
     'SHOES': null,
   }; // 카테고리별 선택된 아이템 인덱스 저장
 
+  final Map<int, bool> _imageLoaded = {}; // 이미지 로딩 상태 저장
+
   void _handleWearTap(int index) {
-    setState(() {
-      if (_selectedIndexes[widget.category] == index) {
-        _selectedIndexes[widget.category] = null; // 선택 해제
-      } else {
-        _selectedIndexes[widget.category] = index; // 새 선택 적용
-      }
-    });
+    if (_imageLoaded[index] == true) {
+      setState(() {
+        if (_selectedIndexes[widget.category] == index) {
+          _selectedIndexes[widget.category] = null; // 선택 해제
+        } else {
+          _selectedIndexes[widget.category] = index; // 새 선택 적용
+        }
+      });
+    }
   }
 
   void _showDeleteDialog() {
@@ -48,12 +53,6 @@ class _WearGridState extends State<WearGrid> {
             style: TextStyle(color: Colors.white70),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
-              },
-              child: const Text('취소', style: TextStyle(color: Colors.grey)),
-            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // 다이얼로그 닫기
@@ -102,23 +101,40 @@ class _WearGridState extends State<WearGrid> {
           onDoubleTap: () {
             _showDetailDialog(wear.wearImageUrl);
           },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(5),
-              border: _selectedIndexes[widget.category] == index
-                  ? Border.all(color: Colors.green, width: 3)
-                  : null,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: CachedNetworkImage(
-                imageUrl: wear.wearImageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(Icons.error_outline, color: Colors.grey, size: 40),
+          child: CachedNetworkImage(
+            imageUrl: wear.wearImageUrl,
+            fit: BoxFit.cover,
+            imageBuilder: (context, imageProvider) {
+              if (!_imageLoaded.containsKey(index)) {
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  setState(() {
+                    _imageLoaded[index] = true;
+                  });
+                });
+              }
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(5),
+                  border: (_selectedIndexes[widget.category] == index && _imageLoaded[index] == true)
+                      ? Border.all(color: Colors.green, width: 3)
+                      : null,
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  ),
                 ),
+              );
+            },
+            placeholder: (context, url) => Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[200], // 로딩 중에도 빈 컨테이너 유지
+                borderRadius: BorderRadius.circular(5),
               ),
+            ),
+            errorWidget: (context, url, error) => const Center(
+              child: Icon(Icons.error_outline, color: Colors.grey, size: 40),
             ),
           ),
         );

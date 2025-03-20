@@ -1,6 +1,6 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
+import 'package:camfit/presentation/screens/MenuPage.dart';
 import 'package:camfit/presentation/widgets/CustomAppBar.dart';
 import 'package:camfit/presentation/widgets/WearGrid.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +78,24 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(title: Text("Profile")),
+      appBar: AppBar(
+        title: Text("Profile"), // 👈 전달된 값에 따라 중앙 정렬 여부 결정
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MenuPage()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -86,9 +103,11 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: _updateProfilePhoto,
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _profilePhotoUrl != null && _profilePhotoUrl!.isNotEmpty
-                    ? CachedNetworkImageProvider(_profilePhotoUrl!) as ImageProvider
-                    : const AssetImage("assets/profile.png"),
+                backgroundImage:
+                    _profilePhotoUrl != null && _profilePhotoUrl!.isNotEmpty
+                        ? CachedNetworkImageProvider(_profilePhotoUrl!)
+                            as ImageProvider
+                        : const AssetImage("assets/profile.png"),
               ),
             ),
             const SizedBox(height: 20),
@@ -114,7 +133,8 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.47,
                 child: WearGrid(
@@ -141,9 +161,9 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor:
-          _selectedCategory == category ? Colors.black : Colors.grey[300],
+              _selectedCategory == category ? Colors.black : Colors.grey[300],
           foregroundColor:
-          _selectedCategory == category ? Colors.white : Colors.black,
+              _selectedCategory == category ? Colors.white : Colors.black,
         ),
         child: Text(category),
       ),

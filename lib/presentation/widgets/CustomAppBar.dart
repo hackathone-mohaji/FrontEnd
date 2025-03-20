@@ -18,6 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: centerTitle, // 👈 전달된 값에 따라 중앙 정렬 여부 결정
       backgroundColor: Colors.white,
       elevation: 0,
+      surfaceTintColor: Colors.transparent,
       iconTheme: const IconThemeData(color: Colors.black),
       actions: [
         IconButton(
