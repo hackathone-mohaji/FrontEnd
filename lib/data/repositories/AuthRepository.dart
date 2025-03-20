@@ -24,8 +24,10 @@ class AuthRepository {
       if (response.statusCode == 200) {
         //Access Token 저장
         final String accessToken = data['accessToken'];
+        final String refreshToken = data['refreshToken'];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', accessToken);
+        await prefs.setString('refreshToken', refreshToken);
 
         return {"success": true, "data": data};
       } else {
