@@ -38,17 +38,20 @@ class HttpClient {
     final prefs = await SharedPreferences.getInstance();
     String? accessToken = prefs.getString('accessToken');
 
+        print("[DEBUG] 기존 accessToken: $accessToken");
     var response = (files != null && files.isNotEmpty)
         ? await _makeMultipartRequest(method, endpoint, token: accessToken, body: body, files: files)
         : await _makeRequest(method, endpoint, token: accessToken, body: body);
 
     if (_isTokenExpired(response)) {
+      print("[DEBUG] 토큰 만료 감지! 리프레시 시도...");
       bool refreshed = await AuthRepository().reissueToken();
       if (refreshed) {
         prefs.reload(); // SharedPreferences 최신화
         accessToken = prefs.getString('accessToken');
-
+        print("[DEBUG] 새로운 accessToken: $accessToken");
         if (accessToken == null || accessToken.isEmpty) {
+          print("[ERROR] 리프레시 성공 후에도 accessToken이 없음!");
           throw Exception("리프레시 토큰으로 새 액세스 토큰을 받았으나 저장되지 않았습니다.");
         }
 
@@ -56,6 +59,7 @@ class HttpClient {
             ? await _makeMultipartRequest(method, endpoint, token: accessToken, body: body, files: files)
             : await _makeRequest(method, endpoint, token: accessToken, body: body);
       } else {
+        print("[ERROR] 리프레시 토큰 갱신 실패! 로그아웃 진행...");
         await AuthRepository().logout();
         if (context.mounted) {
           Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);

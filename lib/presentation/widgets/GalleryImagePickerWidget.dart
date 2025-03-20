@@ -1,13 +1,16 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:photo_manager/photo_manager.dart';
 
 class GalleryImagePickerWidget extends StatefulWidget {
   final Function(AssetEntity) onImageSelected;
   final List<AssetEntity> selectedImages;
+  final Function(bool) onScrollStateChanged;
 
-  const GalleryImagePickerWidget({super.key, required this.onImageSelected, required this.selectedImages});
+  const GalleryImagePickerWidget({super.key, required this.onImageSelected, required this.selectedImages, required this.onScrollStateChanged,});
 
   @override
   State<GalleryImagePickerWidget> createState() => _GalleryImagePickerWidgetState();
@@ -20,6 +23,8 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
   bool _isLoading = false;
   int _currentPage = 0;
   static const int _pageSize = 30;
+  Timer? _scrollStopTimer;
+
 
   @override
   void initState() {
@@ -31,6 +36,7 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _scrollStopTimer?.cancel();
     super.dispose();
   }
 
@@ -74,6 +80,15 @@ class _GalleryImagePickerWidgetState extends State<GalleryImagePickerWidget> {
   }
 
   void _onScroll() {
+    widget.onScrollStateChanged(false);
+
+    _scrollStopTimer?.cancel();
+    _scrollStopTimer = Timer(const Duration(milliseconds: 900), () {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.idle) {
+        widget.onScrollStateChanged(true);
+      }
+    });
+
     if (_isLoading) return;
     if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 100) {
       _loadGalleryImages();

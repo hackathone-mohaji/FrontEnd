@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 1;
 
-  //final PageController _pageController = PageController(initialPage: 1);
+  final PageController _pageController = PageController(initialPage: 1);
 
   final List<Widget> _pages = [
     const UploadOutfitPage(),
@@ -22,27 +22,26 @@ class _HomePageState extends State<HomePage> {
     const ProfilePage(),
   ];
 
-/*
 
-  void _onTabTapped(int index) {
+
+  void _onNavTap(int index) {
+    _pageController.jumpToPage(index); // ✅ 페이지 이동 (즉시 변경)
     setState(() {
       _currentIndex = index;
     });
-    _pageController.jumpToPage(index);
   }
-*/
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
+
       ),
       bottomNavigationBar: SalomonBottomBar(
         backgroundColor: Colors.white,
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: _onNavTap,
         items: [
           SalomonBottomBarItem(
             icon: const Icon(Icons.add_a_photo, size: 34),

@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:camfit/presentation/screens/HomePage.dart';
+import 'package:camfit/presentation/screens/ProfilePage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photo_manager/photo_manager.dart';
@@ -22,6 +24,7 @@ class _UploadOutfitPageState extends State<UploadOutfitPage> with SingleTickerPr
   double _minGalleryHeight = 0.055;
   double _maxGalleryHeight = 0.5;
   bool _isGalleryExpanded = true;
+  bool _isFabVisible = true;
 
   void _onImageSelected(AssetEntity entity) async {
     Uint8List? thumbnail = await entity.thumbnailDataWithSize(const ThumbnailSize(200, 200));
@@ -58,7 +61,7 @@ class _UploadOutfitPageState extends State<UploadOutfitPage> with SingleTickerPr
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("이미지 업로드 성공!")),
       );
-      Navigator.pop(context, 2);
+    //todo: 프로필 페이지로 이동
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("업로드 실패: $e")),
@@ -150,22 +153,28 @@ class _UploadOutfitPageState extends State<UploadOutfitPage> with SingleTickerPr
               child: GalleryImagePickerWidget(
                 onImageSelected: _onImageSelected,
                 selectedImages: _selectedImages,
+                onScrollStateChanged: (bool isStopped) {
+                  setState(() => _isFabVisible = isStopped);
+                },
               ),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _isUploading ? null : _uploadImages,
-        backgroundColor: Colors.white,
-        icon: _isUploading
-            ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
-            : const Icon(Icons.upload, color: Colors.black),
-        label: _isUploading
-            ? const Text("업로드 중...")
-            : const Text("업로드", style: TextStyle(color: Colors.black)),
+      floatingActionButton: AnimatedOpacity(
+        opacity: _isFabVisible ? 1.0 : 0.0, // 🔥 스크롤 상태에 따라 투명도 변경
+        duration: const Duration(milliseconds: 200),
+        child: FloatingActionButton(
+          onPressed: _isUploading ? null : _uploadImages,
+          backgroundColor: Colors.white,
+          elevation: 5, // 버튼 그림자
+          shape: const CircleBorder(),
+            child: _isUploading
+              ? const CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
+              : const Icon(Icons.upload, color: Colors.black),
+        ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
