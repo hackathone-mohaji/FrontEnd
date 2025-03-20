@@ -24,24 +24,18 @@ class _HomePageState extends State<HomePage> {
 
 
 
-  void _onNavTap(int index) {
-    _pageController.jumpToPage(index); // ✅ 페이지 이동 (즉시 변경)
-    setState(() {
-      _currentIndex = index;
-    });
-  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
         children: _pages,
-
       ),
       bottomNavigationBar: SalomonBottomBar(
         backgroundColor: Colors.white,
         currentIndex: _currentIndex,
-        onTap: _onNavTap,
+        onTap: (index) => setState(() => _currentIndex = index),
         items: [
           SalomonBottomBarItem(
             icon: const Icon(Icons.add_a_photo, size: 34),
