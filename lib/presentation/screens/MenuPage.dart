@@ -30,19 +30,19 @@ class _MenuPageState extends State<MenuPage> {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  backgroundColor: Colors.white, // 🔥 버튼 배경색 흰색
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0), // 👈 모서리 둥글기 제거
+                    borderRadius: BorderRadius.circular(10.0), // 모서리 둥글기
+                    side: const BorderSide(color: Colors.redAccent, width: 2), // 🔥 테두리 색상 redAccent
                   ),
                 ),
                 onPressed: _logout,
                 child: const Text(
                   '로그아웃',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(fontSize: 16, color: Colors.redAccent), // 🔥 글씨 색상 redAccent
                 ),
-              ),
+              )
             ],
           ),
         ));
