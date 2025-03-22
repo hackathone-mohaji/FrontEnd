@@ -65,7 +65,23 @@ class OotdRepository {
     debugPrint("Decoded Response: $decodedBody"); // 디버깅용 출력
 
     if (response.statusCode != 200) {
-      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 데이터 등록 실패';
+      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 등록 실패';
+      throw Exception(errorMessage);
+    }
+  }
+
+
+  /// 내 옷 삭제하기 ///
+  Future<void> deleteWear({
+    required BuildContext context,
+    required int wearId}) async {
+    final response = await _httpClient.delete('$_endPoint/$wearId',context: context);
+
+    final decodedBody = utf8.decode(response.bodyBytes);
+    debugPrint("Decoded Response: $decodedBody"); // 디버깅용 출력
+
+    if (response.statusCode != 200) {
+      final errorMessage = jsonDecode(decodedBody)['message'] ?? '옷 삭제 실패';
       throw Exception(errorMessage);
     }
   }

@@ -31,7 +31,7 @@ class _MenuPageState extends State<MenuPage> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white, // 🔥 버튼 배경색 흰색
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0), // 모서리 둥글기
                     side: const BorderSide(color: Colors.redAccent, width: 2), // 🔥 테두리 색상 redAccent

@@ -17,7 +17,7 @@ class _OotdPageState extends State<OotdPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late PageController _pageController;
-  final OotdController _controllerLogic = OotdController();
+  final OotdController _ootdController = OotdController();
 
   final List<OotdDto> _ootdList = []; // ✅ 데이터 저장 리스트
   int _currentPageIndex = 0; // 현재 페이지 인덱스
@@ -52,7 +52,7 @@ class _OotdPageState extends State<OotdPage>
   // API로부터 데이터를 가져와 컬렉션에 추가
   Future<void> _fetchAndAddOotd() async {
     try {
-      final fetchedOOTD = await _controllerLogic.fetchOOTD(context: context);
+      final fetchedOOTD = await _ootdController.fetchOOTD(context: context);
       setState(() {
         _ootdList.add(fetchedOOTD);
       });

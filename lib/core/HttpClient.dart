@@ -28,6 +28,10 @@ class HttpClient {
     return _sendRequest('PATCH', endpoint, body: body, files: files, context: context);
   }
 
+  Future<http.Response> delete(String endpoint, {required BuildContext context}) async {
+    return _sendRequest('DELETE', endpoint, context: context);
+  }
+
   Future<http.Response> _sendRequest(
       String method,
       String endpoint, {
@@ -86,6 +90,8 @@ class HttpClient {
         return await http.post(uri, headers: headers, body: jsonEncode(body));
       case 'PATCH':
         return await http.patch(uri, headers: headers, body: jsonEncode(body));
+        case 'DELETE':
+        return await http.delete(uri, headers: headers);
       default:
         throw UnsupportedError("지원되지 않는 HTTP 메소드입니다.");
     }

@@ -61,11 +61,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadMyWearList() async {
+    setState(() {
+      _wearList = []; // 🔥 먼저 비워줌
+    });
+    await Future.delayed(const Duration(milliseconds: 100)); // 살짝 대기
     try {
       final wearList = await _ootdController.fetchMyWearList(
           context: context, category: _selectedCategory);
       setState(() {
-        _wearList = wearList;
+        _wearList = List.from(wearList); // 새로운 인스턴스로 다시 할당
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -138,8 +142,10 @@ class _ProfilePageState extends State<ProfilePage> {
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.47,
                 child: WearGrid(
+                  key: ValueKey("${_selectedCategory}_${DateTime.now().millisecondsSinceEpoch}"),
                   wearList: _wearList,
-                  category: _selectedCategory, // 선택된 카테고리를 전달
+                  category: _selectedCategory,
+                  onWearListUpdated: _loadMyWearList,// 선택된 카테고리를 전달
                 ),
               ),
             ),

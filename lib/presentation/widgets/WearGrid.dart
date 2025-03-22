@@ -1,19 +1,28 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camfit/data/models/WearDto.dart';
+import 'package:camfit/presentation/controller/OotdController.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 class WearGrid extends StatefulWidget {
   final List<WearDto> wearList;
   final String category; // 카테고리 추가
+  final Future<void> Function() onWearListUpdated;
 
-  const WearGrid({Key? key, required this.wearList, required this.category}) : super(key: key);
+  const WearGrid({
+    Key? key,
+    required this.wearList,
+    required this.category,
+    required this.onWearListUpdated,
+  }) : super(key: key);
 
   @override
   State<WearGrid> createState() => _WearGridState();
 }
 
 class _WearGridState extends State<WearGrid> {
+  final OotdController _ootdController = OotdController();
+
   static final Map<String, int?> _selectedIndexes = {
     'TOP': null,
     'BOTTOM': null,
@@ -22,6 +31,7 @@ class _WearGridState extends State<WearGrid> {
   }; // 카테고리별 선택된 아이템 인덱스 저장
 
   final Map<int, bool> _imageLoaded = {}; // 이미지 로딩 상태 저장
+
 
   void _handleWearTap(int index) {
     if (_imageLoaded[index] == true) {
@@ -35,7 +45,8 @@ class _WearGridState extends State<WearGrid> {
     }
   }
 
-  void _showDeleteDialog() {
+  void _showDeleteDialog(int index) {
+    final wear = widget.wearList[index];
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -43,7 +54,8 @@ class _WearGridState extends State<WearGrid> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0), // 모서리 둥글게
           ),
-          backgroundColor: Colors.black, // 배경색 어둡게
+          backgroundColor: Colors.black,
+          // 배경색 어둡게
           title: const Text(
             '이미지 삭제',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -54,12 +66,18 @@ class _WearGridState extends State<WearGrid> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // 다이얼로그 닫기
+              onPressed: () async {
+                _ootdController.deleteWear(
+                    context: context, wearId: wear.wearId);
+                await widget.onWearListUpdated();
+
+
+                Navigator.of(context).pop();
               },
               style: TextButton.styleFrom(
                 backgroundColor: Colors.white24, // 배경 반투명
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text('삭제', style: TextStyle(color: Colors.white)),
             ),
@@ -82,6 +100,13 @@ class _WearGridState extends State<WearGrid> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _imageLoaded.clear();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return GridView.builder(
       itemCount: widget.wearList.length,
@@ -97,7 +122,7 @@ class _WearGridState extends State<WearGrid> {
           onTap: () {
             _handleWearTap(index);
           },
-          onLongPress: _showDeleteDialog,
+          onLongPress: () => _showDeleteDialog(index),
           onDoubleTap: () {
             _showDetailDialog(wear.wearImageUrl);
           },
@@ -117,7 +142,8 @@ class _WearGridState extends State<WearGrid> {
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(5),
-                  border: (_selectedIndexes[widget.category] == index && _imageLoaded[index] == true)
+                  border: (_selectedIndexes[widget.category] == index &&
+                          _imageLoaded[index] == true)
                       ? Border.all(color: Colors.green, width: 3)
                       : null,
                   image: DecorationImage(
